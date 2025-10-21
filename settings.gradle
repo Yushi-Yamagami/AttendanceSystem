@@ -1,0 +1,8 @@
+rootProject.name = 'AttendanceSystem'
+
+spring.datasource.url=jdbc:mysql://localhost:65534/amsys_db
+spring.datasource.username=root
+spring.datasource.password=pass
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true

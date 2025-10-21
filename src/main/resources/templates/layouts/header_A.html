@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<body>
+  <header th:fragment="header">
+    <div class="container-fluid px-0">
+      <nav class="navbar navbar-expand-lg navbar-light bg-danger border-bottom fixed-top">
+        <div class="container">
+          <a class="navbar-brand fw-bold text-white" th:href="@{/amsys}">出欠席管理システム</a>
+
+          <button class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+  </header>
+</body>
+</html>

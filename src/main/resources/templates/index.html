@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>出欠席管理システム</title>
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <header th:fragment="header">
+        <h1>出欠席管理システム</h1>
+    </header>
+    <div class="container">
+        <h2>ようこそ! 出欠席管理システムへ</h2>
+        <p>このシステムでは、出席・欠席の登録や確認ができます。</p>
+        <a href="/attendance" class="btn" th:href="@{/attendance}">はじめる</a>
+    </div>
+    <footer th:fragment="footer">
+        <p>&copy; 2025 出欠席管理システム</p>
+    </footer>
+</body>
+</html>
