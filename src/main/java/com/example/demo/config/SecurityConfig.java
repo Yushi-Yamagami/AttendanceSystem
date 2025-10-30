@@ -30,7 +30,7 @@ public class SecurityConfig {
 
         http
             //認証用のサービスクラス登録
-            //.userDetailsService(userDetailsServiceImpl)
+            .userDetailsService(userDetailsServiceImpl)
             
             // csrf対策
             //.csrf(c -> c.disable())
@@ -40,9 +40,9 @@ public class SecurityConfig {
             //urlの権限を付与
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/css/**", "/js/**").permitAll() 
-                    //.requestMatchers("").anonymous()
-                    .requestMatchers("/", "/index", "/login", "/register", "/students/**", "/teachers/**").permitAll()//ログインなしで閲覧可能
-                    //.requestMatchers("/css/**", "/js/**").permitAll()
+                    .requestMatchers("/", "/index", "/login").permitAll()//ログインなしで閲覧可能
+                    .requestMatchers("/students/**").hasRole("STUDENT")
+                    .requestMatchers("/teachers/**").hasRole("TEACHER")
                     .anyRequest().authenticated()
             )
             
@@ -50,13 +50,13 @@ public class SecurityConfig {
             .formLogin(form -> form
                     .loginPage("/login") //ログイン画面のurl
                     .successHandler(customLoginSuccessHandler) //ログイン成功時のリダイレクト先
-                    .failureUrl("/login")
+                    .failureUrl("/login?error")
             )
             
             //ログアウト画面の設定
             .logout(logout -> logout
                     .logoutUrl("/logout") //ログアウト画面のurl
-                    .logoutSuccessUrl("/iogin")//ログアウト成功時のリダイレクト先
+                    .logoutSuccessUrl("/")//ログアウト成功時のリダイレクト先
             );
 
         return http.build();
