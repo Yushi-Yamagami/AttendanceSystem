@@ -30,7 +30,7 @@ public class DatabaseResetController {
      * @return リセット結果
      */
     @PostMapping("/reset-database")
-    @PreAuthorize("hasRole('TEACHER')")
+    @PreAuthorize("hasAuthority('ROLE_TEACHER')")
     @ResponseBody
     public ResponseEntity<String> resetDatabase() {
         try {
@@ -40,7 +40,7 @@ public class DatabaseResetController {
         } catch (Exception e) {
             log.error("データベースのリセットに失敗しました", e);
             return ResponseEntity.internalServerError()
-                    .body("データベースのリセットに失敗しました: " + e.getMessage());
+                    .body("データベースのリセットに失敗しました。管理者に連絡してください。");
         }
     }
 }

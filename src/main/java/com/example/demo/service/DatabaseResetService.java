@@ -45,6 +45,9 @@ public class DatabaseResetService {
                  Statement statement = connection.createStatement()) {
                 
                 // スクリプトを個別のSQL文に分割して実行
+                // 注意: セミコロンで分割しているため、文字列リテラル内にセミコロンが
+                // 含まれる場合は正しく動作しません。data-init.sqlでは文字列内に
+                // セミコロンを使用しないでください。
                 String[] sqlStatements = sql.split(";");
                 for (String sqlStatement : sqlStatements) {
                     String trimmed = sqlStatement.trim();

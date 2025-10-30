@@ -41,6 +41,8 @@
 <script>
 document.getElementById('resetDbBtn').addEventListener('click', function() {
     if (confirm('本当にデータベースをリセットしますか？\nすべてのデータが初期状態に戻ります。')) {
+        // 注意: 本番環境ではCSRFトークンを含める必要があります
+        // CSRFが有効な場合は、Thymeleafの th:attr を使用してトークンを追加してください
         fetch('/admin/reset-database', {
             method: 'POST',
             headers: {
