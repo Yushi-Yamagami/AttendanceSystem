@@ -1,10 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>教師メニュー - 出席管理システム</title>
+<link rel="stylesheet" th:href="@{/css/bootstrap/bootstrap.min.css}">
+<link rel="stylesheet" th:href="@{/css/amsys/layout/style.css}">
 </head>
 <body>
+<div class="container mt-5">
+    <h1 class="mb-4">教師メニュー</h1>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">出席管理</h5>
+                    <p class="card-text">学生の出席状況を確認・管理します。</p>
+                    <a href="#" class="btn btn-primary">出席管理画面へ</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">データベースリセット</h5>
+                    <p class="card-text">データベースを初期状態に戻します。</p>
+                    <button id="resetDbBtn" class="btn btn-danger">データベースをリセット</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-3">
+        <a href="/logout" class="btn btn-secondary">ログアウト</a>
+    </div>
+</div>
 
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script>
+document.getElementById('resetDbBtn').addEventListener('click', function() {
+    if (confirm('本当にデータベースをリセットしますか？\nすべてのデータが初期状態に戻ります。')) {
+        fetch('/admin/reset-database', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.text();
+            }
+            throw new Error('リセットに失敗しました');
+        })
+        .then(data => {
+            alert(data);
+            location.reload();
+        })
+        .catch(error => {
+            alert('エラー: ' + error.message);
+        });
+    }
+});
+</script>
 </body>
 </html>

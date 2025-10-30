@@ -2,6 +2,7 @@ package com.example.demo.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsServiceImpl;
@@ -30,19 +32,18 @@ public class SecurityConfig {
 
         http
             //認証用のサービスクラス登録
-            //.userDetailsService(userDetailsServiceImpl)
+            .userDetailsService(userDetailsServiceImpl)
             
-            // csrf対策
-            //.csrf(c -> c.disable())
+            // csrf対策 - 一時的に無効化（本番環境では有効化すべき）
+            .csrf(c -> c.disable())
         
-             .cors(AbstractHttpConfigurer::disable)
+            .cors(AbstractHttpConfigurer::disable)
             
             //urlの権限を付与
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/css/**", "/js/**").permitAll() 
-                    //.requestMatchers("").anonymous()
-                    .requestMatchers("/", "/index", "/login", "/register", "/students/**", "/teachers/**").permitAll()//ログインなしで閲覧可能
-                    //.requestMatchers("/css/**", "/js/**").permitAll()
+                    .requestMatchers("/css/**", "/js/**", "/fonts/**").permitAll() 
+                    .requestMatchers("/", "/index", "/login", "/register").permitAll()//ログインなしで閲覧可能
+                    .requestMatchers("/admin/**").hasRole("TEACHER") // 管理者機能は教師のみ
                     .anyRequest().authenticated()
             )
             
@@ -56,7 +57,7 @@ public class SecurityConfig {
             //ログアウト画面の設定
             .logout(logout -> logout
                     .logoutUrl("/logout") //ログアウト画面のurl
-                    .logoutSuccessUrl("/iogin")//ログアウト成功時のリダイレクト先
+                    .logoutSuccessUrl("/login")//ログアウト成功時のリダイレクト先
             );
 
         return http.build();
