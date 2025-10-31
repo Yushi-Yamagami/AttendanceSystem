@@ -1,23 +1,47 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>出欠席管理システム</title>
-	<link rel="stylesheet" th:href="@{/css/bootstrap/bootstrap.min.css}">
-	<link rel="stylesheet" th:href="@{/css/amsys/layout/style.css}">
+    <title>ホーム</title>
 </head>
 <body>
-    <header th:fragment="header_A">
-        <h1>出欠席管理システム</h1>
-    </header>
-    <div class="container">
-        <h2>ようこそ! 出欠席管理システムへ</h2>
-        <p>このシステムでは、出席・欠席の登録や確認ができます。</p>
-        <a href="/attendance" class="btn" th:href="@{/attendance}">はじめる</a>
+
+<div layout:fragment="content" class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold mb-3">ようこそ！出欠席管理システムへ</h1>
+                <p class="lead text-muted">このシステムでは、出席・欠席の登録や確認ができます。</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-person-circle text-primary" style="font-size: 3rem;"></i>
+                            <h5 class="card-title mt-3">学生用</h5>
+                            <p class="card-text">出席・欠席の登録や履歴の確認ができます。</p>
+                            <a href="#" class="btn btn-primary" th:href="@{/login}">ログイン</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-person-badge text-success" style="font-size: 3rem;"></i>
+                            <h5 class="card-title mt-3">教員用</h5>
+                            <p class="card-text">学生の出席管理やレポートの確認ができます。</p>
+                            <a href="#" class="btn btn-success" th:href="@{/login}">ログイン</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <footer th:fragment="footer">
-        <p>&copy; 2025 出欠席管理システム</p>
-    </footer>
+</div>
+
 </body>
 </html>
