@@ -52,7 +52,7 @@ public class SecurityConfig {
                     .usernameParameter("user_id") //ユーザーIDのパラメータ名
                     .passwordParameter("password") //パスワードのパラメータ名
                     .successHandler(customLoginSuccessHandler) //ログイン成功時のリダイレクト先
-                    .failureUrl("/login")
+                    .failureUrl("/login?error=true") //ログイン失敗時のリダイレクト先
             )
             
             //ログアウト画面の設定
