@@ -2,6 +2,7 @@ package com.example.amsys.service;
 
 import java.util.Collections;
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,10 +24,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userRepository.findByUserId(userid)
                 .orElseThrow(() -> new UsernameNotFoundException("ユーザーIDがありません。 ユーザーID:" + userid));
 
+        // ユーザーのロールに基づいて権限を設定
+        String roleName = "ROLE_" + user.getRole().name();
+        
         return new org.springframework.security.core.userdetails.User(
                 user.getUserId(),
                 user.getPassword(),
-                Collections.emptyList()
+                Collections.singletonList(new SimpleGrantedAuthority(roleName))
         );
     }
 

@@ -52,13 +52,15 @@ public class SecurityConfig {
                     .usernameParameter("user_id") //ユーザーIDのパラメータ名
                     .passwordParameter("password") //パスワードのパラメータ名
                     .successHandler(customLoginSuccessHandler) //ログイン成功時のリダイレクト先
-                    .failureUrl("/login")
+                    .failureUrl("/login?error=true") //ログイン失敗時のリダイレクト先
+                    .permitAll()
             )
             
             //ログアウト画面の設定
             .logout(logout -> logout
                     .logoutUrl("/logout") //ログアウト画面のurl
-                    .logoutSuccessUrl("/login")//ログアウト成功時のリダイレクト先
+                    .logoutSuccessUrl("/login?logout=true") //ログアウト成功時のリダイレクト先
+                    .permitAll()
             );
 
         return http.build();
