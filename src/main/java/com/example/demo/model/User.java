@@ -38,8 +38,8 @@ public class User {
     @Column(name = "password", nullable = false)
     private String hashedPassword;
     
-    @Column(nullable = false, unique = true)
-    private String email;
+    //@Column(nullable = false, unique = true)
+    //private String email;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
