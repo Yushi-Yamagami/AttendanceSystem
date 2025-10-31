@@ -1,4 +1,4 @@
-package com.example.demo.model;
+package com.example.amsys.model;
 
 import java.time.LocalDateTime;
 

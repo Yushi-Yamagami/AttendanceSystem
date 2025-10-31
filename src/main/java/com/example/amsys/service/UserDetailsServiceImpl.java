@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.amsys.service;
 
 import java.util.Collections;
 
@@ -7,8 +7,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
+import com.example.amsys.model.User;
+import com.example.amsys.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,13 +19,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("名前がありません。 名前:" + username));
+    public UserDetails loadUserByUsername(String userid) throws UsernameNotFoundException {
+        User user = userRepository.findByUserId(userid)
+                .orElseThrow(() -> new UsernameNotFoundException("ユーザーIDがありません。 ユーザーID:" + userid));
 
         return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getHush_password(),
+                user.getUserId(),
+                user.getHashedPassword(),
                 Collections.emptyList()
         );
     }

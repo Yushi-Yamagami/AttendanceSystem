@@ -1,4 +1,4 @@
-package com.example.demo.config;
+package com.example.amsys.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,8 +8,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.example.demo.security.CustomLoginSuccessHandler;
-import com.example.demo.service.UserDetailsServiceImpl;
+import com.example.amsys.security.CustomLoginSuccessHandler;
+import com.example.amsys.service.UserDetailsServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 
