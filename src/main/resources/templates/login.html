@@ -18,11 +18,11 @@
       <p class="text-muted">ユーザーIDとパスワードを入力してください</p>
     </div>
 
-    <form th:action="@{/amsys/login}" method="post">
+    <form th:action="@{/login}" method="post">
 
       <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="studentId" name="studentId" placeholder="学生番号" required>
-        <label for="studentId"><i class="bi bi-person-badge-fill me-2"></i>ユーザーID</label>
+        <input type="text" class="form-control" id="username" name="username" placeholder="ユーザーID" required>
+        <label for="username"><i class="bi bi-person-badge-fill me-2"></i>ユーザーID</label>
       </div>
 
       <div class="form-floating mb-4">
@@ -34,7 +34,7 @@
         <button type="submit" class="btn btn-primary btn-lg">
           <i class="bi bi-check-circle me-1"></i> ログイン
         </button>
-        <a th:href="@{/amsys}" class="btn btn-outline-secondary">
+        <a th:href="@{/}" class="btn btn-outline-secondary">
           <i class="bi bi-arrow-left me-1"></i> 戻る
         </a>
       </div>
