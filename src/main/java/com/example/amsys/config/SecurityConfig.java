@@ -49,6 +49,8 @@ public class SecurityConfig {
             //ログイン画面の設定
             .formLogin(form -> form
                     .loginPage("/login") //ログイン画面のurl
+                    .usernameParameter("user_id") //ユーザーIDのパラメータ名
+                    .passwordParameter("password") //パスワードのパラメータ名
                     .successHandler(customLoginSuccessHandler) //ログイン成功時のリダイレクト先
                     .failureUrl("/login")
             )
