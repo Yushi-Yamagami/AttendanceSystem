@@ -30,7 +30,7 @@ public class SecurityConfig {
 
         http
             //認証用のサービスクラス登録
-            //.userDetailsService(userDetailsServiceImpl)
+            .userDetailsService(userDetailsServiceImpl)
             
             // csrf対策
             //.csrf(c -> c.disable())
@@ -56,7 +56,7 @@ public class SecurityConfig {
             //ログアウト画面の設定
             .logout(logout -> logout
                     .logoutUrl("/logout") //ログアウト画面のurl
-                    .logoutSuccessUrl("/iogin")//ログアウト成功時のリダイレクト先
+                    .logoutSuccessUrl("/login")//ログアウト成功時のリダイレクト先
             );
 
         return http.build();
