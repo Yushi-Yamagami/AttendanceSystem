@@ -11,9 +11,9 @@ public class StartController {
 	
 	@GetMapping
 	public String rootIndex() {
-		return "index";
+		return "inde";
 	}
-	
+
 	@GetMapping("index")
 	public String index() {
 		return "index";
