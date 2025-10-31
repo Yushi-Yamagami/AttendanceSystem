@@ -37,14 +37,14 @@ public class User {
     
     @Column(name = "password", nullable = false)
     private String hashedPassword;
-    
-    @Column(nullable = false, unique = true)
-    private String email;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole role;
     
+    //@Column(nullable = false, unique = true)
+    //private String email;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;

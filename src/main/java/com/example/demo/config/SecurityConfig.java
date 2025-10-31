@@ -43,7 +43,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/css/**", "/js/**", "/fonts/**").permitAll() 
                     .requestMatchers("/", "/index", "/login", "/register").permitAll()//ログインなしで閲覧可能
-                    .requestMatchers("/admin/**").hasRole("TEACHER") // 管理者機能は教師のみ
+                    .requestMatchers("/teachers/**").hasRole("TEACHER") // 管理者機能は教師のみ
                     .anyRequest().authenticated()
             )
             
