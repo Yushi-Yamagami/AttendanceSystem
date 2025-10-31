@@ -19,7 +19,7 @@ import lombok.Setter;
 public class AttendanceId implements Serializable {
 	
 	private LocalDate date;
-	private String studentId;
-	private String lessonTimeCode;
+	private Long studentId;
+	private Byte lessontimeCode;
 
 }

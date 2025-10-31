@@ -1,7 +1,5 @@
 package com.example.amsys.model;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,9 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,28 +25,35 @@ public class User {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    @Column(name = "user_id", unique = true)
+    @Column(name = "user_id", unique = true, nullable = false)
     private String userId;
     
-    @Column(name = "password", nullable = false)
-    private String hashedPassword;
-    
-    //@Column(nullable = false, unique = true)
-    //private String email;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole role;
     
-    @Column(name = "created_at", nullable = false, updatable = false)
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
+    @Column(name = "grade_code")
+    private Byte gradeCode;
+    
+    @Column(name = "last_name", nullable = false, length = 16)
+    private String lastName;
+    
+    @Column(name = "first_name", nullable = false, length = 16)
+    private String firstName;
+    
+    @Column(name = "last_kana_name", length = 24)
+    private String lastKanaName;
+    
+    @Column(name = "first_kana_name", length = 24)
+    private String firstKanaName;
+    
+    @Column(name = "password", nullable = false, length = 60)
+    private String password;
+    
+    @Column(unique = true, length = 100)
+    private String email;
     
     public enum UserRole {
         STUDENT, TEACHER

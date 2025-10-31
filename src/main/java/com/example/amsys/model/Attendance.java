@@ -10,7 +10,6 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Entity
@@ -23,25 +22,19 @@ public class Attendance {
 	@EmbeddedId
 	private AttendanceId id;
 	
-	@Column(nullable = false)
+	@Column(name = "status_code", nullable = false)
 	@Enumerated(EnumType.STRING)
-	private AttendanceStatus status;
+	private AttendanceStatus statusCode;
 	
-	@Column(nullable = false)
+	@Column(length = 100)
 	private String reason;
 	
-	@RequiredArgsConstructor
-    @Getter
 	public enum AttendanceStatus {
-		
-		PRESENT("未入力"), 
-		ATTENDANCE("出席"), 
-		ABSENCE("欠席"), 
-		LATENESS("遅刻"),
-		EARLY("早退");
-		
-		private final String displayName;
-		
+		NONE, 
+		PRESENT, 
+		ABSENCE, 
+		LATE,
+		LEAVE_EARLY
 	}
 	
 
