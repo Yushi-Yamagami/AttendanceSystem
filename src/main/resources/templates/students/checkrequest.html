@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<main>
+    <div class="confirmation-container">
+        <h1>申請内容確認</h1>
+        <div class="confirmation-item">
+            <label>日付:</label>
+            <p><%= request.getDate() %></p>
+        </div>
+        <div class="confirmation-item">
+            <label>状態:</label>
+            <p><%= request.getStatusName() %></p>
+        </div>
+        <div class="confirmation-item">
+            <label>時間:</label>
+            <p><%= request.getLessonTime() %></p>
+        </div>
+        <div class="confirmation-item">
+            <label>理由:</label>
+            <p><%= request.getReason() %></p>
+        </div>
+        <div class="confirmation-buttons">
+            <a href="request.html" class="btn btn-secondary">戻る</a>
+            <form action="./SubmitRequest" method="POST">
+                <input type="hidden" name="request_id" value="<%= request.getId() %>">
+                <button type="submit" class="btn btn-primary">送信</button>
+            </form>
+        </div>
+    </div>
+</main>
+
+
+</body>
+</html>
