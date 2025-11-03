@@ -8,32 +8,29 @@
   <link rel="stylesheet" th:href="@{/css/amsys/request.css}">
 </head>
 <body>
-<main>
+<main layout:fragment="content">
     <div class="container my-5">
         <div class="card shadow-sm p-4">
             <h2 class="text-center mb-4">出欠申請</h2>
-            <form action="./AttendanceCreate" method="POST" onsubmit="#">
-                <input type="hidden" name="student_id" value="<%= studentId %>" readonly>
+            <form action="./AttendanceCreate" method="POST" th:action="@{/AttendanceCreate}">
+                <input type="hidden" name="student_id" th:value="${studentId}" readonly>
                 <div class="mb-3">
                     <label for="date" class="form-label">日付</label>
-                    <input type="date" name="date" class="form-control" required>
+                    <input type="date" name="date" id="date" class="form-control" required>
                 </div>
                 <div class="mb-3">
                     <label for="status" class="form-label">状態</label>
-                    <select name="status_code" class="form-select" required>
+                    <select name="status_code" id="status" class="form-select" required>
                         <option value="">選択してください</option>
-                        <% if (statusList != null && !statusList.isEmpty()) { %>
-                        <% for (Status status : statusList) { %>
-                        <option value="<%=status.getStatusCode() %>"><%=status.getStatusName() %></option>
-                        <% } %>
-                        <% } else { %>
-                        <option value="">データがありません</option>
-                        <% } %>
+                        <option th:each="status : ${statusList}" 
+                                th:value="${status.statusCode}" 
+                                th:text="${status.statusName}">
+                        </option>
                     </select>
                 </div>
                 <div class="mb-3">
                     <label for="time" class="form-label">時間</label>
-                    <select name="lesson_time_flag" class="form-select">
+                    <select name="lesson_time_flag" id="time" class="form-select">
                         <option value="">選択してください</option>
                         <option value="AM">午前</option>
                         <option value="PM">午後</option>
@@ -51,6 +48,14 @@
             </form>
         </div>
     </div>
+    <script>
+        function updateCharacterCount() {
+            const textarea = document.getElementById('reason');
+            const charCount = document.getElementById('charCount');
+            const remaining = 100 - textarea.value.length;
+            charCount.textContent = '残り ' + remaining + ' 文字';
+        }
+    </script>
 </main>
 </body>
 </html>

@@ -1,39 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6"
+      layout:decorate="~{layouts/layout}">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>申請内容確認</title>
 </head>
 <body>
-<main>
-    <div class="confirmation-container">
-        <h1>申請内容確認</h1>
-        <div class="confirmation-item">
-            <label>日付:</label>
-            <p><%= request.getDate() %></p>
-        </div>
-        <div class="confirmation-item">
-            <label>状態:</label>
-            <p><%= request.getStatusName() %></p>
-        </div>
-        <div class="confirmation-item">
-            <label>時間:</label>
-            <p><%= request.getLessonTime() %></p>
-        </div>
-        <div class="confirmation-item">
-            <label>理由:</label>
-            <p><%= request.getReason() %></p>
-        </div>
-        <div class="confirmation-buttons">
-            <a href="request.html" class="btn btn-secondary">戻る</a>
-            <form action="./SubmitRequest" method="POST">
-                <input type="hidden" name="request_id" value="<%= request.getId() %>">
-                <button type="submit" class="btn btn-primary">送信</button>
-            </form>
+<main layout:fragment="content">
+    <div class="container my-5">
+        <div class="card shadow-sm p-4">
+            <h2 class="text-center mb-4">申請内容確認</h2>
+            <div class="confirmation-item mb-3">
+                <label class="form-label fw-bold">日付:</label>
+                <p class="form-control-plaintext" th:text="${request.date}"></p>
+            </div>
+            <div class="confirmation-item mb-3">
+                <label class="form-label fw-bold">状態:</label>
+                <p class="form-control-plaintext" th:text="${request.statusName}"></p>
+            </div>
+            <div class="confirmation-item mb-3">
+                <label class="form-label fw-bold">時間:</label>
+                <p class="form-control-plaintext" th:text="${request.lessonTime}"></p>
+            </div>
+            <div class="confirmation-item mb-3">
+                <label class="form-label fw-bold">理由:</label>
+                <p class="form-control-plaintext" th:text="${request.reason}"></p>
+            </div>
+            <div class="confirmation-buttons d-flex justify-content-center gap-3 mt-4">
+                <a th:href="@{/students/request}" class="btn btn-secondary">戻る</a>
+                <form th:action="@{/students/SubmitRequest}" method="POST" class="d-inline">
+                    <input type="hidden" name="request_id" th:value="${request.id}">
+                    <button type="submit" class="btn btn-primary">送信</button>
+                </form>
+            </div>
         </div>
     </div>
 </main>
-
-
 </body>
 </html>
