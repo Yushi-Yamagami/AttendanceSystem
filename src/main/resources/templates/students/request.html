@@ -12,7 +12,7 @@
     <div class="container my-5">
         <div class="card shadow-sm p-4">
             <h2 class="text-center mb-4">出欠申請</h2>
-            <form action="./AttendanceCreate" method="POST" th:action="@{/AttendanceCreate}">
+            <form method="POST" th:action="@{/AttendanceCreate}">
                 <input type="hidden" name="student_id" th:value="${studentId}" readonly>
                 <div class="mb-3">
                     <label for="date" class="form-label">日付</label>
