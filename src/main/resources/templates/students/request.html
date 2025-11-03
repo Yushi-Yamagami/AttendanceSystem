@@ -12,25 +12,23 @@
     <div class="container my-5">
         <div class="card shadow-sm p-4">
             <h2 class="text-center mb-4">出欠申請</h2>
-            <form method="POST" th:action="@{/AttendanceCreate}">
-                <input type="hidden" name="student_id" th:value="${studentId}" readonly>
+            <form method="POST" th:action="@{/students/request/confirm}" th:object="${attendanceRequestForm}">
                 <div class="mb-3">
                     <label for="date" class="form-label">日付</label>
-                    <input type="date" name="date" id="date" class="form-control" required>
+                    <input type="date" th:field="*{date}" id="date" class="form-control" required>
                 </div>
                 <div class="mb-3">
                     <label for="status" class="form-label">状態</label>
-                    <select name="status_code" id="status" class="form-select" required>
+                    <select th:field="*{statusCode}" id="status" class="form-select" required>
                         <option value="">選択してください</option>
-                        <option th:each="status : ${statusList}" 
-                                th:value="${status.statusCode}" 
-                                th:text="${status.statusName}">
-                        </option>
+                        <option value="ABSENCE">欠席</option>
+                        <option value="LATE">遅刻</option>
+                        <option value="LEAVE_EARLY">早退</option>
                     </select>
                 </div>
                 <div class="mb-3">
                     <label for="time" class="form-label">時間</label>
-                    <select name="lesson_time_flag" id="time" class="form-select">
+                    <select th:field="*{lessonTimeFlag}" id="time" class="form-select">
                         <option value="">選択してください</option>
                         <option value="AM">午前</option>
                         <option value="PM">午後</option>
@@ -39,11 +37,11 @@
                 </div>
                 <div class="mb-3">
                     <label for="reason" class="form-label">理由</label>
-                    <textarea name="attendance_reason" id="reason" class="form-control" required maxlength="100" oninput="updateCharacterCount()" style="height: 150px;"></textarea>
+                    <textarea th:field="*{attendanceReason}" id="reason" class="form-control" required maxlength="100" oninput="updateCharacterCount()" style="height: 150px;"></textarea>
                     <div class="form-text" id="charCount">残り 100 文字</div>
                 </div>
                 <div class="text-center">
-                    <button type="submit" class="btn btn-primary w-50">送信</button>
+                    <button type="submit" class="btn btn-primary w-50">確認</button>
                 </div>
             </form>
         </div>

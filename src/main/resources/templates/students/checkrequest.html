@@ -2,7 +2,7 @@
 <html lang="ja" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security6"
-      layout:decorate="~{layouts/layout}">
+      layout:decorate="~{layouts/layout_auth}">
 <head>
     <title>申請内容確認</title>
 </head>
@@ -13,7 +13,7 @@
             <h2 class="text-center mb-4">申請内容確認</h2>
             <div class="confirmation-item mb-3">
                 <label class="form-label fw-bold">日付:</label>
-                <p class="form-control-plaintext" th:text="${request.date}"></p>
+                <p class="form-control-plaintext" th:text="${#temporals.format(request.date, 'yyyy-MM-dd')}"></p>
             </div>
             <div class="confirmation-item mb-3">
                 <label class="form-label fw-bold">状態:</label>
@@ -21,17 +21,16 @@
             </div>
             <div class="confirmation-item mb-3">
                 <label class="form-label fw-bold">時間:</label>
-                <p class="form-control-plaintext" th:text="${request.lessonTime}"></p>
+                <p class="form-control-plaintext" th:text="${request.lessonTimeName != null && !request.lessonTimeName.isEmpty() ? request.lessonTimeName : '指定なし'}"></p>
             </div>
             <div class="confirmation-item mb-3">
                 <label class="form-label fw-bold">理由:</label>
-                <p class="form-control-plaintext" th:text="${request.reason}"></p>
+                <p class="form-control-plaintext" th:text="${request.attendanceReason}"></p>
             </div>
             <div class="confirmation-buttons d-flex justify-content-center gap-3 mt-4">
                 <a th:href="@{/students/request}" class="btn btn-secondary">戻る</a>
-                <form th:action="@{/students/SubmitRequest}" method="POST" class="d-inline">
-                    <input type="hidden" name="request_id" th:value="${request.id}">
-                    <button type="submit" class="btn btn-primary">送信</button>
+                <form th:action="@{/students/request/submit}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-primary">申請</button>
                 </form>
             </div>
         </div>
