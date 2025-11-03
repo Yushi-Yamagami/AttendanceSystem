@@ -2,58 +2,136 @@
 <html lang="ja" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security6"
-      layout:decorate="~{layouts/layout}">
+      layout:decorate="~{layout/layout}">
 <head>
-  <title>出欠席管理システム</title>
-  <link rel="stylesheet" th:href="@{/css/amsys/request.css}">
+    <title>PC予約</title>
+    <link rel="stylesheet" th:href="@{/css/pcms/reservation.css}">
 </head>
 <body>
 <main layout:fragment="content">
-    <div class="container my-5">
-        <div class="card shadow-sm p-4">
-            <h2 class="text-center mb-4">出欠申請</h2>
-            <form method="POST" th:action="@{/students/request/confirm}" th:object="${attendanceRequestForm}">
-                <div class="mb-3">
-                    <label for="date" class="form-label">日付</label>
-                    <input type="date" th:field="*{date}" id="date" class="form-control" required>
+    <div class="container py-4">
+        <h1 class="mb-4">PC予約</h1>
+
+        <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <a th:href="@{/pcms/reservations(date=${prevDate})}" class="btn btn-outline-light btn-sm">&lt; 前日</a>
+                    <form th:action="@{/pcms/reservations}" method="get" class="d-inline-block my-0">
+                        <label>
+                            <input type="date" name="date" th:value="${#temporals.format(selectedDate, 'yyyy-MM-dd')}" onchange="this.form.submit()" class="form-control form-control-sm">
+                        </label>
+                    </form>
+                    <a th:href="@{/pcms/reservations(date=${nextDate})}" class="btn btn-outline-light btn-sm">翌日 &gt;</a>
                 </div>
-                <div class="mb-3">
-                    <label for="status" class="form-label">状態</label>
-                    <select th:field="*{statusCode}" id="status" class="form-select" required>
-                        <option value="">選択してください</option>
-                        <option value="ABSENCE">欠席</option>
-                        <option value="LATE">遅刻</option>
-                        <option value="LEAVE_EARLY">早退</option>
-                    </select>
+            </div>
+            <div class="card-body">
+                <h2 class="h4" th:text="${#temporals.format(selectedDate, 'yyyy年MM月dd日')} + 'の予約一覧'"></h2>
+                <div class="table-responsive" style="overflow-x: auto;">
+                    <table class="table table-hover" style="min-width: 700px;">
+                        <thead>
+                        <tr>
+                            <th>利用者</th>
+                            <th>PC</th>
+                            <th>利用時間帯</th>
+                            <th>ステータス</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(reservations)}">
+                            <td colspan="4" class="text-center text-muted py-4">この日に予約はありません</td>
+                        </tr>
+                        <tr th:each="reservation : ${reservations}">
+                            <td class="text-nowrap" th:text="${reservation.studentName}"></td>
+                            <td class="text-nowrap" th:text="${reservation.pcSerialNumber}"></td>
+                            <td class="text-nowrap" th:text="${reservation.periodName}"></td>
+                            <td>
+                <span th:switch="${reservation.status.name()}">
+                  <span th:case="'PENDING_APPROVAL'" class="badge bg-warning text-dark" th:text="${reservation.status.getDisplayName()}"></span>
+                  <span th:case="'APPROVED'" class="badge" style="background-color: var(--theme-color-primary);" th:text="${reservation.status.getDisplayName()}"></span>
+                  <span th:case="'RETRACTED'" class="badge bg-secondary" th:text="${reservation.status.getDisplayName()}"></span>
+                </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="mb-3">
-                    <label for="time" class="form-label">時間</label>
-                    <select th:field="*{lessonTimeFlag}" id="time" class="form-select">
-                        <option value="">選択してください</option>
-                        <option value="AM">午前</option>
-                        <option value="PM">午後</option>
-                        <option value="ALL">1日</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="reason" class="form-label">理由</label>
-                    <textarea th:field="*{attendanceReason}" id="reason" class="form-control" required maxlength="100" oninput="updateCharacterCount()" style="height: 150px;"></textarea>
-                    <div class="form-text" id="charCount">残り 100 文字</div>
-                </div>
-                <div class="text-center">
-                    <button type="submit" class="btn btn-primary w-50">確認</button>
-                </div>
-            </form>
+            </div>
         </div>
+
+        <div class="card" sec:authorize="isAuthenticated()">
+            <div class="card-header">
+                <h2>新規予約申請</h2>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/pcms/reservations}" th:object="${reservationRequest}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                    <div class="mb-3">
+                        <label for="pc" class="form-label">PC</label>
+                        <select class="form-select" id="pc" th:field="*{pcId}" th:classappend="${#fields.hasErrors('pcId')} ? 'is-invalid' : ''">
+                            <option value="">PCを選択してください</option>
+                            <option th:each="pc : ${pcs}" th:value="${pc.id}" th:text="${pc.serialNumber}"></option>
+                        </select>
+                        <div th:if="${#fields.hasErrors('pcId')}" class="invalid-feedback" th:errors="*{pcId}"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="date" class="form-label">利用日</label>
+                        <input type="date" class="form-control" id="date" th:field="*{date}" th:classappend="${#fields.hasErrors('date')} ? 'is-invalid' : ''">
+                        <div th:if="${#fields.hasErrors('date')}" class="invalid-feedback" th:errors="*{date}"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">利用時間帯（連続した時限のみ選択可）</label>
+                        <div class="d-flex flex-wrap gap-2 mb-2" role="group" aria-label="Time selection helpers">
+                            <button type="button" class="btn btn-outline-secondary" id="select-am">午前</button>
+                            <button type="button" class="btn btn-outline-secondary" id="select-pm">午後</button>
+                            <button type="button" class="btn btn-outline-secondary" id="select-all-day">終日</button>
+                            <button type="button" class="btn btn-outline-secondary" id="select-clear">クリア</button>
+                        </div>
+                        <div th:classappend="${#fields.hasErrors('periodIds')} ? 'is-invalid' : ''">
+                            <div class="form-check form-check-inline custom-checkbox-lg" th:each="p : ${periods}">
+                                <label>
+                                    <input class="form-check-input" type="checkbox" th:field="*{periodIds}" th:value="${p.period}" th:id="|period-${p.period}|">
+                                </label>
+                                <label class="form-check-label" th:for="|period-${p.period}|" th:text="${p.name}"></label>
+                            </div>
+                        </div>
+                        <div th:if="${#fields.hasErrors('periodIds')}" class="invalid-feedback d-block" th:errors="*{periodIds}"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="reason" class="form-label">利用目的</label>
+                        <textarea class="form-control" id="reason" rows="3" th:field="*{reason}" th:classappend="${#fields.hasErrors('reason')} ? 'is-invalid' : ''"></textarea>
+                        <div th:if="${#fields.hasErrors('reason')}" class="invalid-feedback" th:errors="*{reason}"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">予約申請</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="alert alert-info" sec:authorize="!isAuthenticated()">
+            PCを予約するには、<a th:href="@{/pcms/login}" class="alert-link">ログイン</a>してください。
+        </div>
+
+        <div class="mt-5 text-center">
+            <a th:href="@{/pcms}" class="btn btn-secondary"><i class="bi bi-arrow-left-circle"></i> ホームに戻る</a>
+        </div>
+
     </div>
-    <script>
-        function updateCharacterCount() {
-            const textarea = document.getElementById('reason');
-            const charCount = document.getElementById('charCount');
-            const remaining = 100 - textarea.value.length;
-            charCount.textContent = '残り ' + remaining + ' 文字';
-        }
-    </script>
+
+    <th:block layout:fragment="script">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            const bookedData = /*[[${bookedPcsAndPeriods}]]*/ {};
+            /*]]>*/
+        </script>
+        <script th:src="@{/js/reservation.js}" defer></script>
+    </th:block>
 </main>
 </body>
 </html>
