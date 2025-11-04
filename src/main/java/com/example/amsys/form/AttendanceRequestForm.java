@@ -1,6 +1,7 @@
 package com.example.amsys.form;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.validation.constraints.NotEmpty;
@@ -9,12 +10,10 @@ import jakarta.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter @Setter
 @AllArgsConstructor
-@NoArgsConstructor
 public class AttendanceRequestForm {
 	
 	@NotNull
@@ -33,5 +32,10 @@ public class AttendanceRequestForm {
 	// For display in confirmation page
 	private String statusName;
 	private String lessonTimeName;
+	
+	// No-args constructor with proper initialization
+	public AttendanceRequestForm() {
+		this.lessonTimeCodes = new ArrayList<>();
+	}
 
 }
