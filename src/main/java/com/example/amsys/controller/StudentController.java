@@ -90,8 +90,13 @@ public class StudentController {
 		// Create list of AttendanceRequest entities for batch insertion
 		List<AttendanceRequest> requests = new ArrayList<>();
 		
+		// Convert String lesson time codes to Byte
+		List<Byte> byteLessonTimeCodes = form.getLessonTimeCodes().stream()
+				.map(Byte::valueOf)
+				.collect(Collectors.toList());
+		
 		// For each selected lesson time, create a separate request
-		for (Byte lessonTimeCode : form.getLessonTimeCodes()) {
+		for (Byte lessonTimeCode : byteLessonTimeCodes) {
 			AttendanceRequest request = new AttendanceRequest();
 			request.setStudentId(studentId);
 			request.setDate(form.getDate());
@@ -120,12 +125,17 @@ public class StudentController {
 		}
 	}
 	
-	private String getLessonTimeName(List<Byte> lessonTimeCodes) {
+	private String getLessonTimeName(List<String> lessonTimeCodes) {
 		if (lessonTimeCodes == null || lessonTimeCodes.isEmpty()) {
 			return "";
 		}
 		
-		List<LessonTime> lessonTimes = lessonTimeRepository.findAllById(lessonTimeCodes);
+		// Convert String to Byte
+		List<Byte> byteCodes = lessonTimeCodes.stream()
+				.map(Byte::valueOf)
+				.collect(Collectors.toList());
+		
+		List<LessonTime> lessonTimes = lessonTimeRepository.findAllById(byteCodes);
 		return lessonTimes.stream()
 				.map(LessonTime::getLessontimeName)
 				.collect(Collectors.joining(", "));

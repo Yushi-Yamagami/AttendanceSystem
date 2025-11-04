@@ -54,17 +54,22 @@
                 <div class="mb-3">
                     <label class="form-label fw-bold">授業時間 <span class="text-danger">*</span></label>
                     <div class="small text-muted mb-2">※複数選択可能です</div>
-                    <div th:each="lessonTime : ${lessonTimes}">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" th:field="*{lessonTimeCodes}" 
-                                   th:value="${lessonTime.lessontimeCode}" 
-                                   th:id="${'lessonTime' + lessonTime.lessontimeCode}">
-                            <label class="form-check-label" th:for="${'lessonTime' + lessonTime.lessontimeCode}">
-                                <span th:text="${lessonTime.lessontimeName}"></span>
-                                <span class="text-muted small" 
-                                      th:text="${' (' + #temporals.format(lessonTime.startTime, 'HH:mm') + ' - ' + #temporals.format(lessonTime.finishTime, 'HH:mm') + ')'}"></span>
-                            </label>
+                    <div th:if="${lessonTimes != null and !lessonTimes.isEmpty()}">
+                        <div th:each="lessonTime : ${lessonTimes}">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" th:field="*{lessonTimeCodes}" 
+                                       th:value="${lessonTime.lessontimeCode}" 
+                                       th:id="|lessonTime${lessonTime.lessontimeCode}|">
+                                <label class="form-check-label" th:for="|lessonTime${lessonTime.lessontimeCode}|">
+                                    <span th:text="${lessonTime.lessontimeName}"></span>
+                                    <span class="text-muted small" 
+                                          th:text="|（${#temporals.format(lessonTime.startTime, 'HH:mm')} - ${#temporals.format(lessonTime.finishTime, 'HH:mm')}）|"></span>
+                                </label>
+                            </div>
                         </div>
+                    </div>
+                    <div th:if="${lessonTimes == null or lessonTimes.isEmpty()}" class="text-muted">
+                        授業時間データがありません
                     </div>
                     <div th:if="${#fields.hasErrors('lessonTimeCodes')}" class="text-danger small" th:errors="*{lessonTimeCodes}"></div>
                 </div>

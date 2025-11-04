@@ -23,7 +23,7 @@ public class AttendanceRequestForm {
 	private String statusCode;
 	
 	@NotEmpty
-	private List<Byte> lessonTimeCodes;
+	private List<String> lessonTimeCodes;
 	
 	@NotNull
 	@Size(max = 100)

@@ -28,7 +28,9 @@
                 <p class="form-control-plaintext" th:text="${request.attendanceReason}"></p>
             </div>
             <div class="confirmation-buttons d-flex justify-content-center gap-3 mt-4">
-                <a th:href="@{/students/request}" class="btn btn-secondary">戻る</a>
+                <form th:action="@{/students/request}" method="GET" class="d-inline">
+                    <button type="submit" class="btn btn-secondary">戻る</button>
+                </form>
                 <form th:action="@{/students/request/submit}" method="POST" class="d-inline">
                     <button type="submit" class="btn btn-primary">申請</button>
                 </form>
