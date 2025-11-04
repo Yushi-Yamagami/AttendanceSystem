@@ -1,7 +1,9 @@
 package com.example.amsys.form;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -21,7 +23,8 @@ public class AttendanceRequestForm {
 	@NotNull
 	private String statusCode;
 	
-	private String lessonTimeFlag;
+	@NotEmpty
+	private List<Byte> lessonTimeCodes;
 	
 	@NotNull
 	@Size(max = 100)
