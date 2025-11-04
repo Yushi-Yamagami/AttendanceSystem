@@ -54,12 +54,22 @@
                 <div class="mb-3">
                     <label class="form-label fw-bold">授業時間 <span class="text-danger">*</span></label>
                     <div class="small text-muted mb-2">※複数選択可能です</div>
+                    
+                    <!-- Quick selection buttons -->
+                    <div class="mb-2" th:if="${lessonTimes != null and !lessonTimes.isEmpty()}">
+                        <button type="button" class="btn btn-sm btn-outline-secondary me-2" id="selectMorning">午前</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary me-2" id="selectAfternoon">午後</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary me-2" id="selectAllDay">1日</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="clearSelection">クリア</button>
+                    </div>
+                    
                     <div th:if="${lessonTimes != null and !lessonTimes.isEmpty()}">
                         <div th:each="lessonTime : ${lessonTimes}">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" th:field="*{lessonTimeCodes}" 
+                                <input class="form-check-input lesson-time-checkbox" type="checkbox" th:field="*{lessonTimeCodes}" 
                                        th:value="${lessonTime.lessontimeCode}" 
-                                       th:id="|lessonTime${lessonTime.lessontimeCode}|">
+                                       th:id="|lessonTime${lessonTime.lessontimeCode}|"
+                                       th:attr="data-start-time=${#temporals.format(lessonTime.startTime, 'HH:mm')}">
                                 <label class="form-check-label" th:for="|lessonTime${lessonTime.lessontimeCode}|">
                                     <span th:text="${lessonTime.lessontimeName}"></span>
                                     <span class="text-muted small" 
@@ -92,6 +102,110 @@
             </form>
         </div>
     </div>
+    </div>
+    
+    <!-- JavaScript for lesson time selection -->
+    <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('.lesson-time-checkbox');
+        const statusAbsence = document.getElementById('statusAbsence');
+        const statusLate = document.getElementById('statusLate');
+        const statusLeaveEarly = document.getElementById('statusLeaveEarly');
+        const selectMorning = document.getElementById('selectMorning');
+        const selectAfternoon = document.getElementById('selectAfternoon');
+        const selectAllDay = document.getElementById('selectAllDay');
+        const clearSelection = document.getElementById('clearSelection');
+        
+        // Function to check/uncheck all checkboxes
+        function setAllCheckboxes(checked, disabled = false) {
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = checked;
+                checkbox.disabled = disabled;
+            });
+        }
+        
+        // Function to select checkboxes based on time
+        function selectByTime(startHour, endHour) {
+            checkboxes.forEach(function(checkbox) {
+                const startTime = checkbox.getAttribute('data-start-time');
+                if (startTime) {
+                    const hour = parseInt(startTime.split(':')[0]);
+                    if (hour >= startHour && hour < endHour) {
+                        checkbox.checked = true;
+                    }
+                }
+            });
+        }
+        
+        // Function to handle absence status
+        function handleAbsenceStatus() {
+            if (statusAbsence && statusAbsence.checked) {
+                // Check all and disable
+                setAllCheckboxes(true, true);
+            } else {
+                // Enable all checkboxes
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.disabled = false;
+                });
+            }
+        }
+        
+        // Morning button (e.g., before 12:00)
+        if (selectMorning) {
+            selectMorning.addEventListener('click', function() {
+                if (!isAllDayMode()) {
+                    selectByTime(0, 12);
+                }
+            });
+        }
+        
+        // Afternoon button (e.g., 12:00 and after)
+        if (selectAfternoon) {
+            selectAfternoon.addEventListener('click', function() {
+                if (!isAllDayMode()) {
+                    selectByTime(12, 24);
+                }
+            });
+        }
+        
+        // All day button
+        if (selectAllDay) {
+            selectAllDay.addEventListener('click', function() {
+                setAllCheckboxes(true, true);
+            });
+        }
+        
+        // Clear button
+        if (clearSelection) {
+            clearSelection.addEventListener('click', function() {
+                if (!isAllDayMode()) {
+                    setAllCheckboxes(false, false);
+                }
+            });
+        }
+        
+        // Function to check if we're in "all day" mode
+        function isAllDayMode() {
+            return (statusAbsence && statusAbsence.checked) || 
+                   (checkboxes.length > 0 && 
+                    Array.from(checkboxes).every(cb => cb.checked && cb.disabled));
+        }
+        
+        // Status change handlers
+        if (statusAbsence) {
+            statusAbsence.addEventListener('change', handleAbsenceStatus);
+        }
+        if (statusLate) {
+            statusLate.addEventListener('change', handleAbsenceStatus);
+        }
+        if (statusLeaveEarly) {
+            statusLeaveEarly.addEventListener('change', handleAbsenceStatus);
+        }
+        
+        // Initial check on page load
+        handleAbsenceStatus();
+    });
+    </script>
 </main>
 </body>
 </html>
