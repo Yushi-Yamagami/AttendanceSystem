@@ -17,7 +17,9 @@
         <div class="card-body">
           <h5 class="card-title">出欠席管理</h5>
           <p class="card-text">学生の出席・欠席を管理できます。</p>
-          <a href="#" class="btn btn-primary">出欠席を管理する</a>
+          <a th:href="@{/teachers/attendanceList}" class="btn btn-primary">
+            <i class="bi bi-calendar-check me-1"></i>本日の出欠席一覧を見る
+          </a>
         </div>
       </div>
       
