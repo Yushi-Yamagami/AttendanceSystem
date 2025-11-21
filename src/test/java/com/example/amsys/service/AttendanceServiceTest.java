@@ -87,7 +87,8 @@ class AttendanceServiceTest {
     @Test
     void testGetAttendanceListByDateGradeAndLessonTime_WithAttendance() {
         // モックの設定
-        when(userRepository.findAll()).thenReturn(List.of(testStudent1, testStudent2));
+        when(userRepository.findByRoleAndGradeCodeOrderByUserId(UserRole.STUDENT, (byte) 1))
+                .thenReturn(List.of(testStudent1, testStudent2));
         when(lessonTimeRepository.findById((byte) 1)).thenReturn(Optional.of(testLessonTime));
         when(attendanceRepository.findById(any(AttendanceId.class)))
                 .thenReturn(Optional.of(testAttendance))
@@ -117,7 +118,8 @@ class AttendanceServiceTest {
     @Test
     void testGetAttendanceListByDateGradeAndLessonTime_NoStudents() {
         // モックの設定（学生がいない）
-        when(userRepository.findAll()).thenReturn(List.of());
+        when(userRepository.findByRoleAndGradeCodeOrderByUserId(UserRole.STUDENT, (byte) 1))
+                .thenReturn(List.of());
         when(lessonTimeRepository.findById((byte) 1)).thenReturn(Optional.of(testLessonTime));
 
         // テスト実行
@@ -131,15 +133,9 @@ class AttendanceServiceTest {
 
     @Test
     void testGetAttendanceListByDateGradeAndLessonTime_DifferentGrade() {
-        // 別の学年の学生を作成
-        User differentGradeStudent = new User();
-        differentGradeStudent.setId(3L);
-        differentGradeStudent.setUserId("S003");
-        differentGradeStudent.setRole(UserRole.STUDENT);
-        differentGradeStudent.setGradeCode((byte) 2); // 2年生
-
-        // モックの設定
-        when(userRepository.findAll()).thenReturn(List.of(testStudent1, differentGradeStudent));
+        // モックの設定（1年生のみを返す）
+        when(userRepository.findByRoleAndGradeCodeOrderByUserId(UserRole.STUDENT, (byte) 1))
+                .thenReturn(List.of(testStudent1));
         when(lessonTimeRepository.findById((byte) 1)).thenReturn(Optional.of(testLessonTime));
         when(attendanceRepository.findById(any(AttendanceId.class))).thenReturn(Optional.empty());
 

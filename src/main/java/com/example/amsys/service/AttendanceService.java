@@ -32,10 +32,8 @@ public class AttendanceService {
 		
 		List<AttendanceWithUserDto> result = new ArrayList<>();
 		
-		// 指定した学年の学生を取得
-		List<User> students = userRepository.findAll().stream()
-				.filter(u -> u.getRole() == User.UserRole.STUDENT && gradeCode.equals(u.getGradeCode()))
-				.toList();
+		// 指定した学年の学生を取得（データベースレベルでフィルタリング）
+		List<User> students = userRepository.findByRoleAndGradeCodeOrderByUserId(User.UserRole.STUDENT, gradeCode);
 		
 		// コマの情報を取得
 		LessonTime lessonTime = lessonTimeRepository.findById(lessontimeCode).orElse(null);
