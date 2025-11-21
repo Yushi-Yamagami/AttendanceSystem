@@ -1,0 +1,135 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+pageEncoding="UTF-8"%>
+
+<%@ page import="model.Department" %>
+<%@ page import="model.Grade" %>
+<%@ page import="model.LessonTime" %>
+<%@ page import="model.Attendance" %>
+
+<%@ page import="java.util.*" %>
+
+<%--一覧表示画面用 --%>
+<% List<Department> departmentList = (List<Department>)request.getAttribute("departmentList"); %>
+    <% List<Grade> gradeList = (List<Grade>)request.getAttribute("gradeList"); %>
+        <% List<LessonTime> lessonTimeList = (List<LessonTime>)request.getAttribute("lessonTimeList"); %>
+
+            <% List<Attendance> attendanceList = (List<Attendance>)session.getAttribute("attendanceList"); %>
+
+                <% String selectedDepartment = request.getParameter("department"); %>
+                <% String selectedGrade = request.getParameter("grade"); %>
+                <% String selectedLessonTime = request.getParameter("lesson_time"); %>
+
+
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <link rel="stylesheet" type="text/css" href="css/style_teacher.css">
+                    <title>出欠席管理システム</title>
+
+                </head>
+                <body>
+                <header>
+                    <div class="header_box">
+                        <h1>出欠席管理システム</h1>
+                    </div>
+                </header>
+                <main>
+                    <section class="container">
+                        <div class="content04">
+                            <h2>出欠席情報一覧</h2>
+                            <div class="content04_box">
+                                <form action="./ListSearch" name="listSearch" class="search" method="POST">
+                                    <div class="grade">
+                                        <p>学年</p>
+                                        <select id="grade" name="grade" required="required">
+                                            <option value="">選択してください</option>
+                                            <% if (gradeList != null && !gradeList.isEmpty()) { %>
+                                            <% for (Grade grade : gradeList) { %>
+                                            <option value="<%= grade.getGradeCode() %>"
+                                            <%= grade.getGradeCode().equals(selectedGrade) ? "selected" : "" %>>
+                                            <%= grade.getGrade() %>
+                                            </option>
+                                            <% } %>
+                                            <% } else { %>
+                                            <option value="">データがありません</option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class="lesson_time">
+                                        <p>コマ</p>
+                                        <select name="lesson_time" id="lesson_time" required="required">
+                                            <option value="">選択してください</option>
+                                            <% if (lessonTimeList != null && !lessonTimeList.isEmpty()) { %>
+                                            <% for (LessonTime lessonTime : lessonTimeList) { %>
+                                            <option value="<%= lessonTime.getLessonTimeCode() %>"
+                                            <%= lessonTime.getLessonTimeCode().equals(selectedLessonTime) ? "selected" : "" %>>
+                                            <%= lessonTime.getLessonTimeName() %>
+                                            </option>
+                                            <% } %>
+                                            <% } else { %>
+                                            <option value="">データがありません</option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class="button">
+                                        <input type="submit" class="button" value="検索" />
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="attendance_list">
+                                <form action="./AttendanceDetail" name="attendancelist" method="POST">
+                                    <table class="list_table" summary="" border="1" align="center">
+                                        <tr>
+                                            <th class="b">
+                                                <input class="button" type="submit" value="詳細"/>
+                                            </th>
+                                            <th class="b">学籍番号</th>
+                                            <th class="c">氏名</th>
+                                            <th class="c">ふりがな</th>
+                                            <th class="b">状態</th>
+                                        </tr>
+                                        <% if (attendanceList != null && !attendanceList.isEmpty()) { %>
+                                        <% for (Attendance attendance : attendanceList) { %>
+                                        <tr>
+                                            <td align="center">
+                                                <% if (attendance.getStatusCode().equals("S0") && attendance.getStatusName().equals("出席")) { %>
+                                                <input type="radio" name="student_id" value="<%= attendance.getStudentId() %>" disabled />
+                                                <% } else { %>
+                                                <input type="radio" name="student_id" value="<%= attendance.getStudentId() %>" />
+                                                <% } %>
+                                                <input type="hidden" name="lesson_time" value="<%= attendance.getLessonTimeCode() %>" />
+                                            </td>
+                                            <td><%= attendance.getStudentId() %></td>
+                                            <td><%= attendance.getLastName() %><%= attendance.getFirstName() %></td>
+                                            <td><%= attendance.getKanaLastName() %><%= attendance.getKanaFirstName() %></td>
+                                            <td>
+                                                <% if (attendance.getStatusCode().equals("S0") && attendance.getStatusName().equals("出席")) { %>
+                                                <span style="color: green;"><%= attendance.getStatusName() %></span>
+                                                <% } else { %>
+                                                <span style="color: red;"><%= attendance.getStatusName() %></span>
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                                        <% } else { %>
+                                        <tr>
+                                            <td colspan="5" align="center">該当するデータがありません。</td>
+                                        </tr>
+                                        <% } %>
+                                    </table>
+                                </form>
+                            </div>
+                            <div class="back_button">
+                                <input type="button" class="button" value="戻る" onclick="location.href='./TeacherMenu';">
+                            </div>
+                        </div>
+                    </section>
+                </main>
+                <footer>
+                    <div class="footer_box">
+                        <p>T3 B班 企業課題@2024</p>
+                    </div>
+                </footer>
+                </body>
+                </html>
