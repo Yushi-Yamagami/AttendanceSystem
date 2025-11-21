@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">出欠席管理システム</title>
+    <link th:href="@{/css/bootstrap/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap/bootstrap-icons.min.css}" rel="stylesheet">
+    <link th:href="@{/css/amsys/layout/style.css}" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+    </style>
+  </head>
+  <body>
+
+    <div th:replace="~{layouts/header_D :: header_D}"></div>
+
+    <main layout:fragment="content">
+      <!-- 各ページのコンテンツがここに挿入されます -->
+    </main>
+
+    <div th:replace="~{layouts/footer_teacher :: footer_teacher}"></div>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+  </body>
+</html>
