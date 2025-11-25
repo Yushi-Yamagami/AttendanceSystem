@@ -20,7 +20,7 @@ public class AttendanceInputForm {
     @NotNull(message = "日付は必須です")
     private LocalDate date;
     
-    @NotNull(message = "学籍番号は必須です")
+    @NotNull(message = "学生は必須です")
     private Long studentId;
     
     @NotNull(message = "時限は必須です")
