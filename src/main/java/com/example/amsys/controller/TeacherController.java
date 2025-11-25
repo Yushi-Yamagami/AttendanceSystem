@@ -48,6 +48,13 @@ public class TeacherController {
         
         if (requestOpt.isPresent()) {
             AttendanceRequest request = requestOpt.get();
+            
+            // PENDING状態の申請のみ承認可能
+            if (request.getRequestType() != RequestType.PENDING) {
+                redirectAttributes.addFlashAttribute("errorMessage", "この申請は既に処理されています。");
+                return "redirect:/teachers/approval";
+            }
+            
             request.setRequestType(RequestType.APPROVED);
             if (principal != null) {
                 request.setTeacherId(principal.getName());

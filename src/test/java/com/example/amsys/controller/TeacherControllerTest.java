@@ -150,4 +150,26 @@ class TeacherControllerTest {
         assertNull(request.getTeacherId());
         verify(attendanceRequestRepository).save(request);
     }
+
+    @Test
+    void testApproveRequest_AlreadyApproved() {
+        // Given - 既に承認済みの申請
+        Long requestId = 1L;
+        AttendanceRequest request = new AttendanceRequest();
+        request.setRequestId(requestId);
+        request.setStudentId("S001");
+        request.setRequestType(RequestType.APPROVED);  // 既に承認済み
+
+        when(attendanceRequestRepository.findById(requestId)).thenReturn(Optional.of(request));
+
+        // When
+        String viewName = teacherController.approveRequest(requestId, principal, redirectAttributes);
+
+        // Then
+        assertEquals("redirect:/teachers/approval", viewName);
+        // 保存されないことを確認
+        verify(attendanceRequestRepository, never()).save(any());
+        // エラーメッセージが設定されることを確認
+        verify(redirectAttributes).addFlashAttribute(eq("errorMessage"), contains("既に処理されています"));
+    }
 }
