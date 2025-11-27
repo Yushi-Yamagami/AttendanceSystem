@@ -91,8 +91,7 @@ public class DataInitializer implements ApplicationRunner {
             createUser("T22019", (byte) 4, "由布", "美織", "ゆふ", "みおり", "T22019"),
             createUser("T22020", (byte) 4, "湯山", "公晴", "ゆやま", "こうせい", "T22020"),
             createUser("T22021", (byte) 4, "渡辺", "爽流", "わたなべ", "そうる", "T22021"),
-            createUser("T22022", (byte) 4, "綿抜", "唯織", "わたぬき", "いおり", "T22022"),
-            createUser("Teacher1", null, "試験", "太郎", null, null, "password")
+            createUser("T22022", (byte) 4, "綿抜", "唯織", "わたぬき", "いおり", "T22022")
         );
     }
 
