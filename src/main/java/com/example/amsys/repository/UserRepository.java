@@ -7,12 +7,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.example.amsys.model.User;
+import com.example.amsys.model.User.UserRole;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUserId(String userId);
     
-    List<User> findByRoleAndGradeCodeOrderByUserId(User.UserRole role, Byte gradeCode);
+    /**
+     * ロールでユーザーを検索
+     * @param role ユーザーロール
+     * @return ユーザーリスト
+     */
+    List<User> findByRoleOrderByUserIdAsc(UserRole role);
 
 }

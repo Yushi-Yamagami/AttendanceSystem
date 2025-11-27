@@ -2,7 +2,7 @@
 <html lang="ja"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout_teacher}">
+      layout:decorate="~{layouts/layout_auth}">
 <head>
   <title>教員メニュー</title>
 </head>
@@ -15,19 +15,17 @@
       
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">出欠席申請承認</h5>
-          <p class="card-text">学生からの出欠席申請を確認・承認できます。</p>
-          <a th:href="@{/teachers/approval}" class="btn btn-primary">申請を承認する</a>
+          <h5 class="card-title">出席情報入力</h5>
+          <p class="card-text">学生の出席・欠席・遅刻・早退を登録できます。</p>
+          <a th:href="@{/teachers/attendance/input}" class="btn btn-primary">出席情報を入力する</a>
         </div>
       </div>
       
       <div class="card mt-3">
         <div class="card-body">
-          <h5 class="card-title">出欠席管理</h5>
-          <p class="card-text">学生の出席・欠席を管理できます。</p>
-          <a th:href="@{/teachers/attendanceList}" class="btn btn-primary">
-            <i class="bi bi-calendar-check me-1"></i>本日の出欠席一覧を見る
-          </a>
+          <h5 class="card-title">出欠席申請承認</h5>
+          <p class="card-text">学生からの出欠席申請を確認・承認できます。</p>
+          <a th:href="@{/teachers/approval}" class="btn btn-primary">申請を承認する</a>
         </div>
       </div>
       
