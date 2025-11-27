@@ -29,31 +29,31 @@ public class User {
 
     @Column(name = "user_id", unique = true, nullable = false)
     private String userId;
+
+    @Column(name = "grade_code")
+    private Byte gradeCode;
+
+    @Column(name = "last_name", nullable = false, length = 16)
+    private String lastName;
+
+    @Column(name = "first_name", nullable = false, length = 16)
+    private String firstName;
+
+    @Column(name = "last_kana_name", length = 24)
+    private String lastKanaName;
+
+    @Column(name = "first_kana_name", length = 24)
+    private String firstKanaName;
+
+    @Column(unique = true, length = 100)
+    private String email;
+
+    @Column(name = "password", nullable = false, length = 60)
+    private String password;
     
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole role;
-    
-    @Column(name = "grade_code")
-    private Byte gradeCode;
-    
-    @Column(name = "last_name", nullable = false, length = 16)
-    private String lastName;
-    
-    @Column(name = "first_name", nullable = false, length = 16)
-    private String firstName;
-    
-    @Column(name = "last_kana_name", length = 24)
-    private String lastKanaName;
-    
-    @Column(name = "first_kana_name", length = 24)
-    private String firstKanaName;
-    
-    @Column(name = "password", nullable = false, length = 60)
-    private String password;
-    
-    @Column(unique = true, length = 100)
-    private String email;
     
     public enum UserRole {
         STUDENT, TEACHER
