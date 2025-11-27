@@ -20,5 +20,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return ユーザーリスト
      */
     List<User> findByRoleOrderByUserIdAsc(UserRole role);
+    
+    /**
+     * ロールと学年でユーザーを検索
+     * @param role ユーザーロール
+     * @param gradeCode 学年コード
+     * @return ユーザーリスト
+     */
+    List<User> findByRoleAndGradeCodeOrderByUserId(UserRole role, Byte gradeCode);
 
 }
