@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.amsys.dto.AttendanceWithUserDto;
@@ -185,8 +186,8 @@ public class TeacherController {
      */
     @PostMapping("/attendanceList")
     public String searchAttendanceList(
-            @org.springframework.web.bind.annotation.RequestParam("gradeCode") Byte gradeCode,
-            @org.springframework.web.bind.annotation.RequestParam("lessontimeCode") Byte lessontimeCode,
+            @RequestParam("gradeCode") Byte gradeCode,
+            @RequestParam("lessontimeCode") Byte lessontimeCode,
             Model model) {
         
         setupAttendanceListModel(model);
