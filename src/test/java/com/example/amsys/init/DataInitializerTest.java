@@ -226,4 +226,23 @@ class DataInitializerTest {
                 "全ての学生は学年コード4を持つべきです: " + savedUsers.get(i).getUserId());
         }
     }
+
+    @Test
+    void testDataIsAlwaysRefreshedOnStartup() throws Exception {
+        // Given - システム起動時に常にデータが最新の状態に更新されることを確認
+        when(passwordEncoder.encode(anyString())).thenReturn("{bcrypt}encoded");
+
+        // When
+        dataInitializer.run(applicationArguments);
+
+        // Then - 既存データの有無に関わらず、必ずdeleteAllとsaveAllが呼ばれる
+        verify(userRepository).deleteAll();
+        verify(userRepository).saveAll(anyList());
+        verify(lessonTimeRepository).deleteAll();
+        verify(lessonTimeRepository).saveAll(anyList());
+        
+        // データベースが空かどうかをチェックするcount()メソッドは呼ばれないことを確認
+        verify(userRepository, never()).count();
+        verify(lessonTimeRepository, never()).count();
+    }
 }
