@@ -176,16 +176,7 @@ public class TeacherController {
      */
     @GetMapping("/attendanceList")
     public String showAttendanceList(Model model) {
-        model.addAttribute("today", LocalDate.now());
-        
-        // 学年リストを設定（1年生から4年生まで）
-        List<Byte> gradeList = List.of((byte) 1, (byte) 2, (byte) 3, (byte) 4);
-        model.addAttribute("gradeList", gradeList);
-        
-        // 時限一覧を取得
-        List<LessonTime> lessonTimeList = lessonTimeRepository.findAllByOrderByLessontimeCodeAsc();
-        model.addAttribute("lessonTimeList", lessonTimeList);
-        
+        setupAttendanceListModel(model);
         return "teachers/attendanceList";
     }
 
@@ -198,15 +189,7 @@ public class TeacherController {
             @org.springframework.web.bind.annotation.RequestParam("lessontimeCode") Byte lessontimeCode,
             Model model) {
         
-        model.addAttribute("today", LocalDate.now());
-        
-        // 学年リストを設定
-        List<Byte> gradeList = List.of((byte) 1, (byte) 2, (byte) 3, (byte) 4);
-        model.addAttribute("gradeList", gradeList);
-        
-        // 時限一覧を取得
-        List<LessonTime> lessonTimeList = lessonTimeRepository.findAllByOrderByLessontimeCodeAsc();
-        model.addAttribute("lessonTimeList", lessonTimeList);
+        setupAttendanceListModel(model);
         
         // 選択された値を保持
         model.addAttribute("selectedGrade", gradeCode);
@@ -218,6 +201,21 @@ public class TeacherController {
         model.addAttribute("attendanceList", attendanceList);
         
         return "teachers/attendanceList";
+    }
+
+    /**
+     * 出席確認画面の共通モデル設定
+     */
+    private void setupAttendanceListModel(Model model) {
+        model.addAttribute("today", LocalDate.now());
+        
+        // 学年リストを設定（1年生から4年生まで）
+        List<Byte> gradeList = List.of((byte) 1, (byte) 2, (byte) 3, (byte) 4);
+        model.addAttribute("gradeList", gradeList);
+        
+        // 時限一覧を取得
+        List<LessonTime> lessonTimeList = lessonTimeRepository.findAllByOrderByLessontimeCodeAsc();
+        model.addAttribute("lessonTimeList", lessonTimeList);
     }
 
 }
