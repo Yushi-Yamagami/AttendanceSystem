@@ -1,4 +1,4 @@
-package com.example.amsys.config;
+package com.example.amsys.init;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -64,18 +64,30 @@ class DataInitializerTest {
         verify(userRepository).saveAll(userCaptor.capture());
         
         List<User> savedUsers = userCaptor.getValue();
-        assertEquals(19, savedUsers.size(), "19人のユーザーが挿入されるべきです");
+        assertEquals(20, savedUsers.size(), "20人のユーザー（教師1人 + 学生19人）が挿入されるべきです");
         
-        // 最初のユーザーを確認
+        // 最初のユーザー（教師）を確認
         User firstUser = savedUsers.get(0);
-        assertEquals("T22001", firstUser.getUserId());
-        assertEquals((byte) 4, firstUser.getGradeCode());
-        assertEquals("秋山", firstUser.getLastName());
-        assertEquals("政人", firstUser.getFirstName());
-        assertEquals("あきやま", firstUser.getLastKanaName());
-        assertEquals("まさと", firstUser.getFirstKanaName());
-        assertEquals(UserRole.STUDENT, firstUser.getRole());
-        assertTrue(firstUser.getPassword().contains("encoded_T22001"), 
+        assertEquals("teacher001", firstUser.getUserId());
+        assertNull(firstUser.getGradeCode(), "教師には学年コードがないべきです");
+        assertEquals("山田", firstUser.getLastName());
+        assertEquals("太郎", firstUser.getFirstName());
+        assertEquals("やまだ", firstUser.getLastKanaName());
+        assertEquals("たろう", firstUser.getFirstKanaName());
+        assertEquals(UserRole.TEACHER, firstUser.getRole());
+        assertTrue(firstUser.getPassword().contains("encoded_teacher001"), 
+            "パスワードがハッシュ化されるべきです");
+        
+        // 2番目のユーザー（学生）を確認
+        User secondUser = savedUsers.get(1);
+        assertEquals("T22001", secondUser.getUserId());
+        assertEquals((byte) 4, secondUser.getGradeCode());
+        assertEquals("秋山", secondUser.getLastName());
+        assertEquals("政人", secondUser.getFirstName());
+        assertEquals("あきやま", secondUser.getLastKanaName());
+        assertEquals("まさと", secondUser.getFirstKanaName());
+        assertEquals(UserRole.STUDENT, secondUser.getRole());
+        assertTrue(secondUser.getPassword().contains("encoded_T22001"), 
             "パスワードがハッシュ化されるべきです");
     }
 
@@ -161,12 +173,12 @@ class DataInitializerTest {
                 "パスワードはBCryptでハッシュ化されるべきです: " + user.getUserId());
         }
         
-        // パスワードエンコーダーが19回呼ばれたことを確認
-        verify(passwordEncoder, times(19)).encode(anyString());
+        // パスワードエンコーダーが20回呼ばれたことを確認（教師1人 + 学生19人）
+        verify(passwordEncoder, times(20)).encode(anyString());
     }
 
     @Test
-    void testAllUsersHaveCorrectRole() throws Exception {
+    void testUsersHaveCorrectRoles() throws Exception {
         // Given
         when(userRepository.count()).thenReturn(0L);
         when(lessonTimeRepository.count()).thenReturn(0L);
@@ -181,14 +193,20 @@ class DataInitializerTest {
         verify(userRepository).saveAll(userCaptor.capture());
         
         List<User> savedUsers = userCaptor.getValue();
-        for (User user : savedUsers) {
-            assertEquals(UserRole.STUDENT, user.getRole(), 
-                "全てのユーザーはSTUDENTロールを持つべきです: " + user.getUserId());
+        
+        // 最初のユーザーは教師
+        assertEquals(UserRole.TEACHER, savedUsers.get(0).getRole(), 
+            "最初のユーザーはTEACHERロールを持つべきです");
+        
+        // 残りのユーザーは学生
+        for (int i = 1; i < savedUsers.size(); i++) {
+            assertEquals(UserRole.STUDENT, savedUsers.get(i).getRole(), 
+                "2番目以降のユーザーはSTUDENTロールを持つべきです: " + savedUsers.get(i).getUserId());
         }
     }
 
     @Test
-    void testAllUsersHaveGradeCode4() throws Exception {
+    void testStudentsHaveGradeCode4() throws Exception {
         // Given
         when(userRepository.count()).thenReturn(0L);
         when(lessonTimeRepository.count()).thenReturn(0L);
@@ -203,9 +221,15 @@ class DataInitializerTest {
         verify(userRepository).saveAll(userCaptor.capture());
         
         List<User> savedUsers = userCaptor.getValue();
-        for (User user : savedUsers) {
-            assertEquals((byte) 4, user.getGradeCode(), 
-                "全てのユーザーは学年コード4を持つべきです: " + user.getUserId());
+        
+        // 教師には学年コードがない
+        assertNull(savedUsers.get(0).getGradeCode(), 
+            "教師には学年コードがないべきです");
+        
+        // 全ての学生は学年コード4を持つ
+        for (int i = 1; i < savedUsers.size(); i++) {
+            assertEquals((byte) 4, savedUsers.get(i).getGradeCode(), 
+                "全ての学生は学年コード4を持つべきです: " + savedUsers.get(i).getUserId());
         }
     }
 }
