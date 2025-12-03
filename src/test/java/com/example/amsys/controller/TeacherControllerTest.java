@@ -29,11 +29,15 @@ import com.example.amsys.repository.AttendanceRepository;
 import com.example.amsys.repository.AttendanceRequestRepository;
 import com.example.amsys.repository.LessonTimeRepository;
 import com.example.amsys.repository.UserRepository;
+import com.example.amsys.service.AttendanceService;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.security.Principal;
+import java.util.stream.Collectors;
+
+import com.example.amsys.dto.AttendanceWithUserDto;
 
 /**
  * TeacherControllerのテスト
@@ -63,6 +67,9 @@ class TeacherControllerTest {
 
     @Mock
     private BindingResult bindingResult;
+
+    @Mock
+    private AttendanceService attendanceService;
 
     @InjectMocks
     private TeacherController teacherController;
@@ -306,5 +313,96 @@ class TeacherControllerTest {
         verify(attendanceRepository, never()).save(any());
         verify(model).addAttribute("students", students);
         verify(model).addAttribute("lessonTimes", lessonTimes);
+    }
+
+    // 出席確認機能のテスト
+
+    @Test
+    void testShowAttendanceList_InitialDisplay() {
+        // Given
+        List<LessonTime> lessonTimes = new ArrayList<>();
+        LessonTime lessonTime1 = new LessonTime();
+        lessonTime1.setLessontimeCode((byte) 1);
+        lessonTime1.setLessontimeName("1限");
+        lessonTime1.setStartTime(LocalTime.of(9, 0));
+        lessonTime1.setFinishTime(LocalTime.of(10, 30));
+        lessonTimes.add(lessonTime1);
+
+        when(lessonTimeRepository.findAllByOrderByLessontimeCodeAsc()).thenReturn(lessonTimes);
+
+        // When
+        String viewName = teacherController.showAttendanceList(model);
+
+        // Then
+        assertEquals("teachers/attendanceList", viewName);
+        verify(model).addAttribute(eq("today"), any(LocalDate.class));
+        verify(model).addAttribute(eq("gradeList"), anyList());
+        verify(model).addAttribute("lessonTimeList", lessonTimes);
+    }
+
+    @Test
+    void testSearchAttendanceList_WithResults() {
+        // Given
+        Byte gradeCode = 4;
+        Byte lessontimeCode = 1;
+
+        List<LessonTime> lessonTimes = new ArrayList<>();
+        LessonTime lessonTime = new LessonTime();
+        lessonTime.setLessontimeCode((byte) 1);
+        lessonTime.setLessontimeName("1限");
+        lessonTime.setStartTime(LocalTime.of(9, 0));
+        lessonTime.setFinishTime(LocalTime.of(10, 30));
+        lessonTimes.add(lessonTime);
+
+        List<AttendanceWithUserDto> attendanceList = new ArrayList<>();
+        AttendanceWithUserDto dto = new AttendanceWithUserDto();
+        dto.setDate(LocalDate.now());
+        dto.setUserId("T22001");
+        dto.setLastName("秋山");
+        dto.setFirstName("政人");
+        dto.setLastKanaName("あきやま");
+        dto.setFirstKanaName("まさと");
+        dto.setGradeCode(gradeCode);
+        dto.setStatusCode(Attendance.AttendanceStatus.PRESENT);
+        dto.setStatusName("出席");
+        attendanceList.add(dto);
+
+        when(lessonTimeRepository.findAllByOrderByLessontimeCodeAsc()).thenReturn(lessonTimes);
+        when(attendanceService.getAttendanceListByDateGradeAndLessonTime(any(LocalDate.class), eq(gradeCode), eq(lessontimeCode)))
+            .thenReturn(attendanceList);
+
+        // When
+        String viewName = teacherController.searchAttendanceList(gradeCode, lessontimeCode, model);
+
+        // Then
+        assertEquals("teachers/attendanceList", viewName);
+        verify(model).addAttribute(eq("today"), any(LocalDate.class));
+        verify(model).addAttribute(eq("gradeList"), anyList());
+        verify(model).addAttribute("lessonTimeList", lessonTimes);
+        verify(model).addAttribute("selectedGrade", gradeCode);
+        verify(model).addAttribute("selectedLessonTime", lessontimeCode);
+        verify(model).addAttribute("attendanceList", attendanceList);
+        verify(attendanceService).getAttendanceListByDateGradeAndLessonTime(any(LocalDate.class), eq(gradeCode), eq(lessontimeCode));
+    }
+
+    @Test
+    void testSearchAttendanceList_NoResults() {
+        // Given
+        Byte gradeCode = 1;
+        Byte lessontimeCode = 1;
+
+        List<LessonTime> lessonTimes = new ArrayList<>();
+        List<AttendanceWithUserDto> emptyList = new ArrayList<>();
+
+        when(lessonTimeRepository.findAllByOrderByLessontimeCodeAsc()).thenReturn(lessonTimes);
+        when(attendanceService.getAttendanceListByDateGradeAndLessonTime(any(LocalDate.class), eq(gradeCode), eq(lessontimeCode)))
+            .thenReturn(emptyList);
+
+        // When
+        String viewName = teacherController.searchAttendanceList(gradeCode, lessontimeCode, model);
+
+        // Then
+        assertEquals("teachers/attendanceList", viewName);
+        verify(model).addAttribute("attendanceList", emptyList);
     }
 }

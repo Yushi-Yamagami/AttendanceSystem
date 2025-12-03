@@ -99,6 +99,15 @@
                             <td th:text="${attendance.userId}"></td>
                             <td th:text="${attendance.lastName + ' ' + attendance.firstName}"></td>
                             <td th:text="${attendance.lastKanaName + ' ' + attendance.firstKanaName}"></td>
+                            <td>
+                                <span th:classappend="${attendance.statusCode.name() == 'PRESENT'} ? 'status-present' : 
+                                                      (${attendance.statusCode.name() == 'ABSENCE'} ? 'status-absent' : 
+                                                      (${attendance.statusCode.name() == 'LATE'} ? 'status-late' : 
+                                                      (${attendance.statusCode.name() == 'LEAVE_EARLY'} ? 'status-leave-early' : 'status-none')))"
+                                      th:text="${attendance.statusName}">
+                                </span>
+                            </td>
+                            <td th:text="${attendance.reason != null ? attendance.reason : '-'}"></td>
                         </tr>
                         </tbody>
                     </table>

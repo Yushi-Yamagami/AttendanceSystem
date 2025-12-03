@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.amsys.dto.AttendanceWithUserDto;
 import com.example.amsys.form.AttendanceInputForm;
 import com.example.amsys.model.Attendance;
 import com.example.amsys.model.AttendanceId;
@@ -28,6 +29,7 @@ import com.example.amsys.repository.AttendanceRepository;
 import com.example.amsys.repository.AttendanceRequestRepository;
 import com.example.amsys.repository.LessonTimeRepository;
 import com.example.amsys.repository.UserRepository;
+import com.example.amsys.service.AttendanceService;
 
 import jakarta.validation.Valid;
 
@@ -46,6 +48,9 @@ public class TeacherController {
     
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private AttendanceService attendanceService;
 
     /**
      * 承認待ちの申請一覧を表示
@@ -164,6 +169,55 @@ public class TeacherController {
         
         redirectAttributes.addFlashAttribute("successMessage", "出席情報を登録しました。");
         return "redirect:/teachers/attendance/input";
+    }
+
+    /**
+     * 出席確認画面を表示（GET）
+     */
+    @GetMapping("/attendanceList")
+    public String showAttendanceList(Model model) {
+        model.addAttribute("today", LocalDate.now());
+        
+        // 学年リストを設定（1年生から4年生まで）
+        List<Byte> gradeList = List.of((byte) 1, (byte) 2, (byte) 3, (byte) 4);
+        model.addAttribute("gradeList", gradeList);
+        
+        // 時限一覧を取得
+        List<LessonTime> lessonTimeList = lessonTimeRepository.findAllByOrderByLessontimeCodeAsc();
+        model.addAttribute("lessonTimeList", lessonTimeList);
+        
+        return "teachers/attendanceList";
+    }
+
+    /**
+     * 出席確認検索処理（POST）
+     */
+    @PostMapping("/attendanceList")
+    public String searchAttendanceList(
+            @org.springframework.web.bind.annotation.RequestParam("gradeCode") Byte gradeCode,
+            @org.springframework.web.bind.annotation.RequestParam("lessontimeCode") Byte lessontimeCode,
+            Model model) {
+        
+        model.addAttribute("today", LocalDate.now());
+        
+        // 学年リストを設定
+        List<Byte> gradeList = List.of((byte) 1, (byte) 2, (byte) 3, (byte) 4);
+        model.addAttribute("gradeList", gradeList);
+        
+        // 時限一覧を取得
+        List<LessonTime> lessonTimeList = lessonTimeRepository.findAllByOrderByLessontimeCodeAsc();
+        model.addAttribute("lessonTimeList", lessonTimeList);
+        
+        // 選択された値を保持
+        model.addAttribute("selectedGrade", gradeCode);
+        model.addAttribute("selectedLessonTime", lessontimeCode);
+        
+        // 出席情報を取得
+        List<AttendanceWithUserDto> attendanceList = attendanceService.getAttendanceListByDateGradeAndLessonTime(
+            LocalDate.now(), gradeCode, lessontimeCode);
+        model.addAttribute("attendanceList", attendanceList);
+        
+        return "teachers/attendanceList";
     }
 
 }
