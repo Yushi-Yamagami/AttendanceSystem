@@ -50,8 +50,6 @@ class DataInitializerTest {
     @Test
     void testInitializeUsersWhenEmpty() throws Exception {
         // Given
-        when(userRepository.count()).thenReturn(0L);
-        when(lessonTimeRepository.count()).thenReturn(0L);
         when(passwordEncoder.encode(anyString())).thenAnswer(invocation -> 
             "{bcrypt}encoded_" + invocation.getArgument(0));
 
@@ -59,6 +57,9 @@ class DataInitializerTest {
         dataInitializer.run(applicationArguments);
 
         // Then
+        verify(userRepository).deleteAll();
+        verify(lessonTimeRepository).deleteAll();
+        
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<User>> userCaptor = ArgumentCaptor.forClass(List.class);
         verify(userRepository).saveAll(userCaptor.capture());
@@ -68,14 +69,14 @@ class DataInitializerTest {
         
         // 最初のユーザー（教師）を確認
         User firstUser = savedUsers.get(0);
-        assertEquals("teacher001", firstUser.getUserId());
+        assertEquals("Admin01", firstUser.getUserId());
         assertNull(firstUser.getGradeCode(), "教師には学年コードがないべきです");
-        assertEquals("山田", firstUser.getLastName());
+        assertEquals("試験", firstUser.getLastName());
         assertEquals("太郎", firstUser.getFirstName());
-        assertEquals("やまだ", firstUser.getLastKanaName());
+        assertEquals("しけん", firstUser.getLastKanaName());
         assertEquals("たろう", firstUser.getFirstKanaName());
         assertEquals(UserRole.TEACHER, firstUser.getRole());
-        assertTrue(firstUser.getPassword().contains("encoded_teacher001"), 
+        assertTrue(firstUser.getPassword().contains("encoded_Teacher2025"), 
             "パスワードがハッシュ化されるべきです");
         
         // 2番目のユーザー（学生）を確認
@@ -94,27 +95,27 @@ class DataInitializerTest {
     @Test
     void testInitializeUsersWhenExisting() throws Exception {
         // Given
-        when(userRepository.count()).thenReturn(5L);
-        when(lessonTimeRepository.count()).thenReturn(5L);
+        when(passwordEncoder.encode(anyString())).thenReturn("{bcrypt}encoded");
 
         // When
         dataInitializer.run(applicationArguments);
 
-        // Then
-        verify(userRepository, never()).saveAll(anyList());
+        // Then - データが存在する場合でも削除して再挿入される
+        verify(userRepository).deleteAll();
+        verify(userRepository).saveAll(anyList());
     }
 
     @Test
     void testInitializeLessonTimesWhenEmpty() throws Exception {
         // Given
-        when(userRepository.count()).thenReturn(0L);
-        when(lessonTimeRepository.count()).thenReturn(0L);
         when(passwordEncoder.encode(anyString())).thenReturn("{bcrypt}encoded");
 
         // When
         dataInitializer.run(applicationArguments);
 
         // Then
+        verify(lessonTimeRepository).deleteAll();
+        
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<LessonTime>> lessonTimeCaptor = ArgumentCaptor.forClass(List.class);
         verify(lessonTimeRepository).saveAll(lessonTimeCaptor.capture());
@@ -140,22 +141,19 @@ class DataInitializerTest {
     @Test
     void testInitializeLessonTimesWhenExisting() throws Exception {
         // Given
-        when(userRepository.count()).thenReturn(0L);
-        when(lessonTimeRepository.count()).thenReturn(3L);
         when(passwordEncoder.encode(anyString())).thenReturn("{bcrypt}encoded");
 
         // When
         dataInitializer.run(applicationArguments);
 
-        // Then
-        verify(lessonTimeRepository, never()).saveAll(anyList());
+        // Then - データが存在する場合でも削除して再挿入される
+        verify(lessonTimeRepository).deleteAll();
+        verify(lessonTimeRepository).saveAll(anyList());
     }
 
     @Test
     void testPasswordsAreHashed() throws Exception {
         // Given
-        when(userRepository.count()).thenReturn(0L);
-        when(lessonTimeRepository.count()).thenReturn(0L);
         when(passwordEncoder.encode(anyString())).thenAnswer(invocation -> 
             "{bcrypt}$2a$10$hashedpassword_" + invocation.getArgument(0));
 
@@ -180,8 +178,6 @@ class DataInitializerTest {
     @Test
     void testUsersHaveCorrectRoles() throws Exception {
         // Given
-        when(userRepository.count()).thenReturn(0L);
-        when(lessonTimeRepository.count()).thenReturn(0L);
         when(passwordEncoder.encode(anyString())).thenReturn("{bcrypt}encoded");
 
         // When
@@ -208,8 +204,6 @@ class DataInitializerTest {
     @Test
     void testStudentsHaveGradeCode4() throws Exception {
         // Given
-        when(userRepository.count()).thenReturn(0L);
-        when(lessonTimeRepository.count()).thenReturn(0L);
         when(passwordEncoder.encode(anyString())).thenReturn("{bcrypt}encoded");
 
         // When

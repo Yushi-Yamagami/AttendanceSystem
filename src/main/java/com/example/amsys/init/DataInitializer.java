@@ -41,32 +41,34 @@ public class DataInitializer implements ApplicationRunner {
      * レッスン時間データを初期化
      */
     private void initializeLessonTimes() {
-        if (lessonTimeRepository.count() == 0) {
-            List<LessonTime> lessonTimes = Arrays.asList(
-                new LessonTime((byte) 0, "HR", LocalTime.of(8, 50, 0), LocalTime.of(8, 59, 0)),
-                new LessonTime((byte) 1, "1限", LocalTime.of(9, 0, 0), LocalTime.of(10, 30, 0)),
-                new LessonTime((byte) 2, "2限", LocalTime.of(10, 40, 0), LocalTime.of(12, 10, 0)),
-                new LessonTime((byte) 3, "3限", LocalTime.of(13, 0, 0), LocalTime.of(14, 30, 0)),
-                new LessonTime((byte) 4, "4限", LocalTime.of(14, 40, 0), LocalTime.of(16, 10, 0))
-            );
-            lessonTimeRepository.saveAll(lessonTimes);
-            log.info("レッスン時間データを初期化しました。{}件のデータを挿入しました。", lessonTimes.size());
-        } else {
-            log.info("レッスン時間データは既に存在します。スキップします。");
-        }
+        // 既存データを削除
+        lessonTimeRepository.deleteAll();
+        log.info("既存のレッスン時間データを削除しました。");
+        
+        // 最新のデータを挿入
+        List<LessonTime> lessonTimes = Arrays.asList(
+            new LessonTime((byte) 0, "HR", LocalTime.of(8, 50, 0), LocalTime.of(8, 59, 0)),
+            new LessonTime((byte) 1, "1限", LocalTime.of(9, 0, 0), LocalTime.of(10, 30, 0)),
+            new LessonTime((byte) 2, "2限", LocalTime.of(10, 40, 0), LocalTime.of(12, 10, 0)),
+            new LessonTime((byte) 3, "3限", LocalTime.of(13, 0, 0), LocalTime.of(14, 30, 0)),
+            new LessonTime((byte) 4, "4限", LocalTime.of(14, 40, 0), LocalTime.of(16, 10, 0))
+        );
+        lessonTimeRepository.saveAll(lessonTimes);
+        log.info("レッスン時間データを初期化しました。{}件のデータを挿入しました。", lessonTimes.size());
     }
 
     /**
      * ユーザーデータを初期化
      */
     private void initializeUsers() {
-        if (userRepository.count() == 0) {
-            List<User> users = createInitialUsers();
-            userRepository.saveAll(users);
-            log.info("ユーザーデータを初期化しました。{}件のデータを挿入しました。", users.size());
-        } else {
-            log.info("ユーザーデータは既に存在します。スキップします。");
-        }
+        // 既存データを削除
+        userRepository.deleteAll();
+        log.info("既存のユーザーデータを削除しました。");
+        
+        // 最新のデータを挿入
+        List<User> users = createInitialUsers();
+        userRepository.saveAll(users);
+        log.info("ユーザーデータを初期化しました。{}件のデータを挿入しました。", users.size());
     }
 
     /**
