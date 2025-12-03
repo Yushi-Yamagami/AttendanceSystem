@@ -76,7 +76,7 @@ public class DataInitializer implements ApplicationRunner {
         List<User> users = new ArrayList<>();
         
         // 教師データを追加
-        users.add(createTeacher("teacher001", "山田", "太郎", "やまだ", "たろう", "teacher001"));
+        users.add(createTeacher("Admin01", "試験", "太郎", "しけん", "たろう", "Teacher2025"));
         
         // 学生データを追加
         users.addAll(Arrays.asList(
