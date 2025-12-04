@@ -41,7 +41,7 @@ public class SecurityConfig {
             
             //urlの権限を付与
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/css/**", "/js/**").permitAll() 
+                    .requestMatchers("/css/**", "/js/**", "/fonts/**").permitAll()
                     //.requestMatchers("").anonymous()
                     .requestMatchers("/", "/index", "/login", "/register", "/students/**", "/teachers/**").permitAll()//ログインなしで閲覧可能
                     //.requestMatchers("/css/**", "/js/**").permitAll()
