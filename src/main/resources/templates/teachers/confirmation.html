@@ -112,7 +112,11 @@
                                 
                                 <td th:text="${student.userId}"></td>
                                 <td th:text="${student.studentName}"></td>
-                                <td th:text="${attendanceList[__${iterStat.index}__].lastKanaName + ' ' + attendanceList[__${iterStat.index}__].firstKanaName}"></td>
+                                <td>
+                                    <span th:with="currentAttendance=${attendanceList[__${iterStat.index}__]}"
+                                          th:text="${currentAttendance.lastKanaName + ' ' + currentAttendance.firstKanaName}">
+                                    </span>
+                                </td>
                                 <td>
                                     <select class="form-select status-select" 
                                             th:field="*{studentAttendances[__${iterStat.index}__].statusCode}">

@@ -2,6 +2,7 @@ package com.example.amsys.controller;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -256,13 +257,13 @@ public class TeacherController {
         batchForm.setLessontimeCode(lessontimeCode);
         
         // 学生ごとのフォームを作成
-        List<BatchAttendanceForm.StudentAttendanceForm> studentForms = new java.util.ArrayList<>();
+        List<BatchAttendanceForm.StudentAttendanceForm> studentForms = new ArrayList<>();
         for (AttendanceWithUserDto dto : attendanceList) {
             BatchAttendanceForm.StudentAttendanceForm studentForm = new BatchAttendanceForm.StudentAttendanceForm();
             studentForm.setStudentId(dto.getStudentId());
             studentForm.setUserId(dto.getUserId());
             studentForm.setStudentName(dto.getLastName() + " " + dto.getFirstName());
-            studentForm.setStatusCode(dto.getStatusCode() != null ? dto.getStatusCode().name() : "PRESENT");
+            studentForm.setStatusCode(dto.getStatusCode() != null ? dto.getStatusCode().name() : Attendance.AttendanceStatus.PRESENT.name());
             studentForm.setReason(dto.getReason());
             studentForms.add(studentForm);
         }
@@ -297,7 +298,6 @@ public class TeacherController {
         }
         
         // 各学生の出席情報を保存
-        int savedCount = 0;
         for (BatchAttendanceForm.StudentAttendanceForm studentForm : form.getStudentAttendances()) {
             AttendanceId attendanceId = new AttendanceId(
                 form.getDate(),
@@ -324,11 +324,10 @@ public class TeacherController {
             
             // 保存
             attendanceRepository.save(attendance);
-            savedCount++;
         }
         
         redirectAttributes.addFlashAttribute("successMessage", 
-            savedCount + "件の出席情報を登録しました。");
+            form.getStudentAttendances().size() + "件の出席情報を登録しました。");
         return "redirect:/teachers/confirmation";
     }
 
