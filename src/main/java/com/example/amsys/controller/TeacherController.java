@@ -19,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.amsys.dto.AttendanceWithUserDto;
 import com.example.amsys.form.AttendanceInputForm;
+import com.example.amsys.form.BatchAttendanceForm;
 import com.example.amsys.model.Attendance;
 import com.example.amsys.model.AttendanceId;
 import com.example.amsys.model.AttendanceRequest;
@@ -217,6 +218,118 @@ public class TeacherController {
         // 時限一覧を取得
         List<LessonTime> lessonTimeList = lessonTimeRepository.findAllByOrderByLessontimeCodeAsc();
         model.addAttribute("lessonTimeList", lessonTimeList);
+    }
+
+    /**
+     * 一括出席登録画面を表示（GET）
+     */
+    @GetMapping("/confirmation")
+    public String showBatchAttendanceForm(Model model) {
+        setupAttendanceListModel(model);
+        return "teachers/confirmation";
+    }
+
+    /**
+     * 一括出席登録画面を表示（POST - 学年と時限で検索）
+     */
+    @PostMapping("/confirmation")
+    public String searchForBatchAttendance(
+            @RequestParam("gradeCode") Byte gradeCode,
+            @RequestParam("lessontimeCode") Byte lessontimeCode,
+            Model model) {
+        
+        setupAttendanceListModel(model);
+        
+        // 選択された値を保持
+        model.addAttribute("selectedGrade", gradeCode);
+        model.addAttribute("selectedLessonTime", lessontimeCode);
+        
+        // 出席情報を取得
+        List<AttendanceWithUserDto> attendanceList = attendanceService.getAttendanceListByDateGradeAndLessonTime(
+            LocalDate.now(), gradeCode, lessontimeCode);
+        model.addAttribute("attendanceList", attendanceList);
+        
+        // バッチフォームを準備
+        BatchAttendanceForm batchForm = new BatchAttendanceForm();
+        batchForm.setDate(LocalDate.now());
+        batchForm.setGradeCode(gradeCode);
+        batchForm.setLessontimeCode(lessontimeCode);
+        
+        // 学生ごとのフォームを作成
+        List<BatchAttendanceForm.StudentAttendanceForm> studentForms = new java.util.ArrayList<>();
+        for (AttendanceWithUserDto dto : attendanceList) {
+            BatchAttendanceForm.StudentAttendanceForm studentForm = new BatchAttendanceForm.StudentAttendanceForm();
+            studentForm.setStudentId(dto.getStudentId());
+            studentForm.setUserId(dto.getUserId());
+            studentForm.setStudentName(dto.getLastName() + " " + dto.getFirstName());
+            studentForm.setStatusCode(dto.getStatusCode() != null ? dto.getStatusCode().name() : "PRESENT");
+            studentForm.setReason(dto.getReason());
+            studentForms.add(studentForm);
+        }
+        batchForm.setStudentAttendances(studentForms);
+        
+        model.addAttribute("batchAttendanceForm", batchForm);
+        
+        return "teachers/confirmation";
+    }
+
+    /**
+     * 一括出席登録を実行
+     */
+    @PostMapping("/confirmation/submit")
+    public String submitBatchAttendance(
+            @Valid @ModelAttribute("batchAttendanceForm") BatchAttendanceForm form,
+            BindingResult result,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        
+        if (result.hasErrors()) {
+            setupAttendanceListModel(model);
+            
+            // エラーがある場合は出席情報を再取得
+            List<AttendanceWithUserDto> attendanceList = attendanceService.getAttendanceListByDateGradeAndLessonTime(
+                form.getDate(), form.getGradeCode(), form.getLessontimeCode());
+            model.addAttribute("attendanceList", attendanceList);
+            model.addAttribute("selectedGrade", form.getGradeCode());
+            model.addAttribute("selectedLessonTime", form.getLessontimeCode());
+            
+            return "teachers/confirmation";
+        }
+        
+        // 各学生の出席情報を保存
+        int savedCount = 0;
+        for (BatchAttendanceForm.StudentAttendanceForm studentForm : form.getStudentAttendances()) {
+            AttendanceId attendanceId = new AttendanceId(
+                form.getDate(),
+                studentForm.getStudentId(),
+                form.getLessontimeCode()
+            );
+            
+            // 既存の出席情報があるか確認
+            Optional<Attendance> existingAttendance = attendanceRepository.findById(attendanceId);
+            
+            Attendance attendance;
+            if (existingAttendance.isPresent()) {
+                // 既存レコードを更新
+                attendance = existingAttendance.get();
+            } else {
+                // 新規レコードを作成
+                attendance = new Attendance();
+                attendance.setId(attendanceId);
+            }
+            
+            // ステータスを設定
+            attendance.setStatusCode(Attendance.AttendanceStatus.valueOf(studentForm.getStatusCode()));
+            attendance.setReason(studentForm.getReason());
+            
+            // 保存
+            attendanceRepository.save(attendance);
+            savedCount++;
+        }
+        
+        redirectAttributes.addFlashAttribute("successMessage", 
+            savedCount + "件の出席情報を登録しました。");
+        return "redirect:/teachers/confirmation";
     }
 
 }
