@@ -45,7 +45,6 @@
                                     <th>日付</th>
                                     <th>時限</th>
                                     <th>状態</th>
-                                    <th>理由</th>
                                     <th>申請日時</th>
                                     <th>操作</th>
                                 </tr>
@@ -61,15 +60,22 @@
                                         <span th:if="${request.status.name() == 'LATE'}" class="badge bg-warning text-dark">遅刻</span>
                                         <span th:if="${request.status.name() == 'LEAVE_EARLY'}" class="badge bg-info">早退</span>
                                     </td>
-                                    <td>
-                                        <span th:text="${#strings.abbreviate(request.reason, 30)}"></span>
-                                    </td>
                                     <td th:text="${#temporals.format(request.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
                                     <td>
+                                        <a th:href="@{/teachers/approval/{id}(id=${request.requestId})}" 
+                                           class="btn btn-info btn-sm me-1">
+                                            <i class="bi bi-eye"></i> 詳細
+                                        </a>
                                         <form th:action="@{/teachers/approval/{id}/approve(id=${request.requestId})}" method="post" style="display: inline;">
-                                            <button type="submit" class="btn btn-success btn-sm" 
+                                            <button type="submit" class="btn btn-success btn-sm me-1" 
                                                     onclick="return confirm('この申請を承認しますか？')">
                                                 <i class="bi bi-check-lg"></i> 承認
+                                            </button>
+                                        </form>
+                                        <form th:action="@{/teachers/approval/{id}/reject(id=${request.requestId})}" method="post" style="display: inline;">
+                                            <button type="submit" class="btn btn-danger btn-sm" 
+                                                    onclick="return confirm('この申請を拒否しますか？')">
+                                                <i class="bi bi-x-lg"></i> 拒否
                                             </button>
                                         </form>
                                     </td>

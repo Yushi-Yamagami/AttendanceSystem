@@ -71,7 +71,8 @@ public class AttendanceRequest {
 	
 	public enum RequestType {
 		PENDING,
-		APPROVED
+		APPROVED,
+		REJECTED
 	}
 
 }

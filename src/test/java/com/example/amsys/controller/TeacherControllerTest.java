@@ -203,6 +203,118 @@ class TeacherControllerTest {
         verify(redirectAttributes).addFlashAttribute(eq("errorMessage"), contains("既に処理されています"));
     }
 
+    @Test
+    void testShowApprovalDetail_Success() {
+        // Given
+        Long requestId = 1L;
+        AttendanceRequest request = new AttendanceRequest();
+        request.setRequestId(requestId);
+        request.setStudentId("S001");
+        request.setDate(LocalDate.now());
+        request.setLessontimeCode((byte) 1);
+        request.setStatus(AttendanceRequestStatus.ABSENCE);
+        request.setReason("体調不良");
+        request.setRequestType(RequestType.PENDING);
+        request.setCreatedAt(LocalDateTime.now());
+
+        User student = new User();
+        student.setUserId("S001");
+        student.setLastName("山田");
+        student.setFirstName("太郎");
+
+        LessonTime lessonTime = new LessonTime();
+        lessonTime.setLessontimeCode((byte) 1);
+        lessonTime.setLessontimeName("1限");
+        lessonTime.setStartTime(LocalTime.of(9, 0));
+        lessonTime.setFinishTime(LocalTime.of(10, 30));
+
+        when(attendanceRequestRepository.findById(requestId)).thenReturn(Optional.of(request));
+        when(userRepository.findByUserId("S001")).thenReturn(Optional.of(student));
+        when(lessonTimeRepository.findById((byte) 1)).thenReturn(Optional.of(lessonTime));
+
+        // When
+        String viewName = teacherController.showApprovalDetail(requestId, model, redirectAttributes);
+
+        // Then
+        assertEquals("teachers/approvalDetail", viewName);
+        verify(model).addAttribute("request", request);
+        verify(model).addAttribute("student", student);
+        verify(model).addAttribute("lessonTime", lessonTime);
+    }
+
+    @Test
+    void testShowApprovalDetail_RequestNotFound() {
+        // Given
+        Long requestId = 999L;
+        when(attendanceRequestRepository.findById(requestId)).thenReturn(Optional.empty());
+
+        // When
+        String viewName = teacherController.showApprovalDetail(requestId, model, redirectAttributes);
+
+        // Then
+        assertEquals("redirect:/teachers/approval", viewName);
+        verify(redirectAttributes).addFlashAttribute(eq("errorMessage"), contains("見つかりませんでした"));
+    }
+
+    @Test
+    void testRejectRequest_Success() {
+        // Given
+        Long requestId = 1L;
+        AttendanceRequest request = new AttendanceRequest();
+        request.setRequestId(requestId);
+        request.setStudentId("S001");
+        request.setRequestType(RequestType.PENDING);
+
+        when(attendanceRequestRepository.findById(requestId)).thenReturn(Optional.of(request));
+        when(attendanceRequestRepository.save(any(AttendanceRequest.class))).thenReturn(request);
+        when(principal.getName()).thenReturn("T001");
+
+        // When
+        String viewName = teacherController.rejectRequest(requestId, principal, redirectAttributes);
+
+        // Then
+        assertEquals("redirect:/teachers/approval", viewName);
+        assertEquals(RequestType.REJECTED, request.getRequestType());
+        assertEquals("T001", request.getTeacherId());
+        verify(attendanceRequestRepository).save(request);
+        verify(redirectAttributes).addFlashAttribute(eq("successMessage"), contains("拒否しました"));
+    }
+
+    @Test
+    void testRejectRequest_RequestNotFound() {
+        // Given
+        Long requestId = 999L;
+        when(attendanceRequestRepository.findById(requestId)).thenReturn(Optional.empty());
+
+        // When
+        String viewName = teacherController.rejectRequest(requestId, principal, redirectAttributes);
+
+        // Then
+        assertEquals("redirect:/teachers/approval", viewName);
+        verify(attendanceRequestRepository, never()).save(any());
+        verify(redirectAttributes).addFlashAttribute(eq("errorMessage"), contains("見つかりませんでした"));
+    }
+
+    @Test
+    void testRejectRequest_AlreadyProcessed() {
+        // Given
+        Long requestId = 1L;
+        AttendanceRequest request = new AttendanceRequest();
+        request.setRequestId(requestId);
+        request.setStudentId("S001");
+        request.setRequestType(RequestType.APPROVED);  // 既に承認済み
+
+        when(attendanceRequestRepository.findById(requestId)).thenReturn(Optional.of(request));
+
+        // When
+        String viewName = teacherController.rejectRequest(requestId, principal, redirectAttributes);
+
+        // Then
+        assertEquals("redirect:/teachers/approval", viewName);
+        verify(attendanceRequestRepository, never()).save(any());
+        verify(redirectAttributes).addFlashAttribute(eq("errorMessage"), contains("既に処理されています"));
+    }
+
     // 出席情報入力機能のテスト
 
     @Test
