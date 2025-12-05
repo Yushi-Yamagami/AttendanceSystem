@@ -264,7 +264,7 @@ public class TeacherController {
             studentForm.setUserId(dto.getUserId());
             studentForm.setStudentName(dto.getLastName() + " " + dto.getFirstName());
             studentForm.setStatusCode(dto.getStatusCode() != null ? dto.getStatusCode().name() : Attendance.AttendanceStatus.PRESENT.name());
-            studentForm.setReason(null);
+            studentForm.setReason(null); // 理由入力は不要のためnullを設定
             studentForms.add(studentForm);
         }
         batchForm.setStudentAttendances(studentForms);
@@ -320,7 +320,7 @@ public class TeacherController {
             
             // ステータスを設定
             attendance.setStatusCode(Attendance.AttendanceStatus.valueOf(studentForm.getStatusCode()));
-            attendance.setReason(null);
+            attendance.setReason(null); // 理由入力は不要のためnullを設定
             
             // 保存
             attendanceRepository.save(attendance);
