@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout_auth}">
+<head>
+    <title>申請詳細</title>
+    <style>
+        .detail-card {
+            margin-bottom: 1rem;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #495057;
+        }
+        .detail-value {
+            padding: 0.5rem;
+            background-color: #f8f9fa;
+            border-radius: 0.25rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+
+<div layout:fragment="content" class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-4"><i class="bi bi-file-text me-2"></i>申請詳細</h1>
+            
+            <!-- Request Detail Card -->
+            <div class="card detail-card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>申請情報</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="detail-label">申請ID</div>
+                            <div class="detail-value" th:text="${request.requestId}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-label">申請日時</div>
+                            <div class="detail-value" th:text="${#temporals.format(request.createdAt, 'yyyy年MM月dd日 HH:mm:ss')}"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="detail-label">学籍番号</div>
+                            <div class="detail-value" th:text="${request.studentId}"></div>
+                        </div>
+                        <div class="col-md-6" th:if="${student != null}">
+                            <div class="detail-label">氏名</div>
+                            <div class="detail-value" th:text="${student.lastName + ' ' + student.firstName}"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="detail-label">日付</div>
+                            <div class="detail-value" th:text="${#temporals.format(request.date, 'yyyy年MM月dd日')}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-label">時限</div>
+                            <div class="detail-value">
+                                <span th:text="${request.lessontimeCode} + '時限'"></span>
+                                <span th:if="${lessonTime != null}" th:text="' (' + ${lessonTime.startTime} + '～' + ${lessonTime.finishTime} + ')'"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="detail-label">状態</div>
+                            <div class="detail-value">
+                                <span th:if="${request.status.name() == 'ABSENCE'}" class="badge bg-danger fs-6">欠席</span>
+                                <span th:if="${request.status.name() == 'LATE'}" class="badge bg-warning text-dark fs-6">遅刻</span>
+                                <span th:if="${request.status.name() == 'LEAVE_EARLY'}" class="badge bg-info fs-6">早退</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="detail-label">理由</div>
+                            <div class="detail-value" style="min-height: 100px; white-space: pre-wrap;" th:text="${request.reason != null ? request.reason : '理由が記載されていません'}"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3" th:if="${request.requestType.name() != 'PENDING'}">
+                        <div class="col-md-6">
+                            <div class="detail-label">処理状況</div>
+                            <div class="detail-value">
+                                <span th:if="${request.requestType.name() == 'APPROVED'}" class="badge bg-success fs-6">承認済み</span>
+                                <span th:if="${request.requestType.name() == 'REJECTED'}" class="badge bg-danger fs-6">拒否済み</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6" th:if="${request.teacherId != null}">
+                            <div class="detail-label">処理した教員</div>
+                            <div class="detail-value" th:text="${request.teacherId}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="card" th:if="${request.requestType.name() == 'PENDING'}">
+                <div class="card-body text-center">
+                    <form th:action="@{/teachers/approval/{id}/approve(id=${request.requestId})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-success btn-lg me-2" 
+                                onclick="return confirm('この申請を承認しますか？')">
+                            <i class="bi bi-check-circle me-1"></i> 承認する
+                        </button>
+                    </form>
+                    <form th:action="@{/teachers/approval/{id}/reject(id=${request.requestId})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger btn-lg me-2" 
+                                onclick="return confirm('この申請を拒否しますか？')">
+                            <i class="bi bi-x-circle me-1"></i> 拒否する
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Back Button -->
+            <div class="mt-4">
+                <a th:href="@{/teachers/approval}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> 申請一覧に戻る
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

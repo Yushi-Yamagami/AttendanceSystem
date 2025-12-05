@@ -65,6 +65,40 @@ public class TeacherController {
     }
 
     /**
+     * 申請の詳細を表示
+     */
+    @GetMapping("/approval/{requestId}")
+    public String showApprovalDetail(
+            @PathVariable Long requestId,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        
+        Optional<AttendanceRequest> requestOpt = attendanceRequestRepository.findById(requestId);
+        
+        if (requestOpt.isPresent()) {
+            AttendanceRequest request = requestOpt.get();
+            model.addAttribute("request", request);
+            
+            // 学生情報を取得
+            Optional<User> userOpt = userRepository.findByUserId(request.getStudentId());
+            if (userOpt.isPresent()) {
+                model.addAttribute("student", userOpt.get());
+            }
+            
+            // 時限情報を取得
+            Optional<LessonTime> lessonTimeOpt = lessonTimeRepository.findById(request.getLessontimeCode());
+            if (lessonTimeOpt.isPresent()) {
+                model.addAttribute("lessonTime", lessonTimeOpt.get());
+            }
+            
+            return "teachers/approvalDetail";
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "申請が見つかりませんでした。");
+            return "redirect:/teachers/approval";
+        }
+    }
+
+    /**
      * 申請を承認する
      */
     @PostMapping("/approval/{requestId}/approve")
@@ -90,6 +124,39 @@ public class TeacherController {
             }
             attendanceRequestRepository.save(request);
             redirectAttributes.addFlashAttribute("successMessage", "申請ID " + requestId + " を承認しました。");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "申請が見つかりませんでした。");
+        }
+        
+        return "redirect:/teachers/approval";
+    }
+
+    /**
+     * 申請を拒否する
+     */
+    @PostMapping("/approval/{requestId}/reject")
+    public String rejectRequest(
+            @PathVariable Long requestId,
+            Principal principal,
+            RedirectAttributes redirectAttributes) {
+        
+        Optional<AttendanceRequest> requestOpt = attendanceRequestRepository.findById(requestId);
+        
+        if (requestOpt.isPresent()) {
+            AttendanceRequest request = requestOpt.get();
+            
+            // PENDING状態の申請のみ拒否可能
+            if (request.getRequestType() != RequestType.PENDING) {
+                redirectAttributes.addFlashAttribute("errorMessage", "この申請は既に処理されています。");
+                return "redirect:/teachers/approval";
+            }
+            
+            request.setRequestType(RequestType.REJECTED);
+            if (principal != null) {
+                request.setTeacherId(principal.getName());
+            }
+            attendanceRequestRepository.save(request);
+            redirectAttributes.addFlashAttribute("successMessage", "申請ID " + requestId + " を拒否しました。");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "申請が見つかりませんでした。");
         }
