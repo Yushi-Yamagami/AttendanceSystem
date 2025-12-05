@@ -13,10 +13,6 @@
         .status-select {
             width: 150px;
         }
-        .reason-input {
-            width: 100%;
-            min-width: 200px;
-        }
     </style>
 </head>
 <body>
@@ -101,7 +97,6 @@
                                 <th>氏名</th>
                                 <th>ふりがな</th>
                                 <th>状態</th>
-                                <th>理由</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -125,12 +120,6 @@
                                         <option value="LATE">遅刻</option>
                                         <option value="LEAVE_EARLY">早退</option>
                                     </select>
-                                </td>
-                                <td>
-                                    <input type="text" 
-                                           class="form-control reason-input" 
-                                           th:field="*{studentAttendances[__${iterStat.index}__].reason}"
-                                           placeholder="理由（任意）">
                                 </td>
                             </tr>
                             </tbody>
