@@ -442,14 +442,13 @@ public class TeacherController {
         }
         
         // 検索日から1か月分の日付範囲を計算
-        LocalDate startDate = searchDate.withDayOfMonth(1);
         LocalDate endDate = yearMonth.atEndOfMonth();
         
         // 出席情報を取得
         List<AttendanceWithUserDto> attendanceList = attendanceService.getMonthlyAttendanceReport(
-            startDate, endDate, gradeCode, lessontimeCode);
+            searchDate, endDate, gradeCode, lessontimeCode);
         model.addAttribute("attendanceList", attendanceList);
-        model.addAttribute("startDate", startDate);
+        model.addAttribute("startDate", searchDate);
         model.addAttribute("endDate", endDate);
         
         return "teachers/monthlyReport";
@@ -470,12 +469,11 @@ public class TeacherController {
         LocalDate searchDate = yearMonth.atDay(1);
         
         // 検索日から1か月分の日付範囲を計算
-        LocalDate startDate = searchDate.withDayOfMonth(1);
         LocalDate endDate = yearMonth.atEndOfMonth();
         
         // 出席情報を取得
         List<AttendanceWithUserDto> attendanceList = attendanceService.getMonthlyAttendanceReport(
-            startDate, endDate, gradeCode, lessontimeCode);
+            searchDate, endDate, gradeCode, lessontimeCode);
         
         // CSV出力の設定
         String fileName = "attendance_report_" + searchDate.format(DateTimeFormatter.ofPattern("yyyyMM")) + ".csv";
