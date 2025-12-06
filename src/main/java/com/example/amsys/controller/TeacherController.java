@@ -1,7 +1,12 @@
 package com.example.amsys.controller;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +22,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.opencsv.CSVWriter;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.example.amsys.dto.AttendanceWithUserDto;
 import com.example.amsys.form.AttendanceInputForm;
@@ -396,6 +405,124 @@ public class TeacherController {
         redirectAttributes.addFlashAttribute("successMessage", 
             form.getStudentAttendances().size() + "件の出席情報を登録しました。");
         return "redirect:/teachers/confirmation";
+    }
+
+    /**
+     * 月間出席情報確認画面を表示（GET）
+     */
+    @GetMapping("/monthlyReport")
+    public String showMonthlyReport(Model model) {
+        setupMonthlyReportModel(model);
+        return "teachers/monthlyReport";
+    }
+
+    /**
+     * 月間出席情報検索処理（POST）
+     */
+    @PostMapping("/monthlyReport")
+    public String searchMonthlyReport(
+            @RequestParam("searchDate") String searchDateStr,
+            @RequestParam(value = "gradeCode", required = false) Byte gradeCode,
+            @RequestParam(value = "lessontimeCode", required = false) Byte lessontimeCode,
+            Model model) {
+        
+        setupMonthlyReportModel(model);
+        
+        // yyyy-MM形式の文字列をLocalDateに変換（月の最初の日）
+        YearMonth yearMonth = YearMonth.parse(searchDateStr);
+        LocalDate searchDate = yearMonth.atDay(1);
+        
+        // 選択された値を保持
+        model.addAttribute("searchDate", searchDate);
+        if (gradeCode != null) {
+            model.addAttribute("selectedGrade", gradeCode);
+        }
+        if (lessontimeCode != null) {
+            model.addAttribute("selectedLessonTime", lessontimeCode);
+        }
+        
+        // 検索日から1か月分の日付範囲を計算
+        LocalDate startDate = searchDate.withDayOfMonth(1);
+        LocalDate endDate = yearMonth.atEndOfMonth();
+        
+        // 出席情報を取得
+        List<AttendanceWithUserDto> attendanceList = attendanceService.getMonthlyAttendanceReport(
+            startDate, endDate, gradeCode, lessontimeCode);
+        model.addAttribute("attendanceList", attendanceList);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        
+        return "teachers/monthlyReport";
+    }
+
+    /**
+     * 月間出席情報をCSV出力
+     */
+    @GetMapping("/monthlyReport/export")
+    public void exportMonthlyReportCsv(
+            @RequestParam("searchDate") String searchDateStr,
+            @RequestParam(value = "gradeCode", required = false) Byte gradeCode,
+            @RequestParam(value = "lessontimeCode", required = false) Byte lessontimeCode,
+            HttpServletResponse response) throws IOException {
+        
+        // yyyy-MM形式の文字列をLocalDateに変換
+        YearMonth yearMonth = YearMonth.parse(searchDateStr);
+        LocalDate searchDate = yearMonth.atDay(1);
+        
+        // 検索日から1か月分の日付範囲を計算
+        LocalDate startDate = searchDate.withDayOfMonth(1);
+        LocalDate endDate = yearMonth.atEndOfMonth();
+        
+        // 出席情報を取得
+        List<AttendanceWithUserDto> attendanceList = attendanceService.getMonthlyAttendanceReport(
+            startDate, endDate, gradeCode, lessontimeCode);
+        
+        // CSV出力の設定
+        String fileName = "attendance_report_" + searchDate.format(DateTimeFormatter.ofPattern("yyyyMM")) + ".csv";
+        response.setContentType("text/csv; charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+        
+        try (OutputStreamWriter writer = new OutputStreamWriter(response.getOutputStream(), StandardCharsets.UTF_8);
+             CSVWriter csvWriter = new CSVWriter(writer)) {
+            
+            // BOMを出力（Excelでの文字化け防止）
+            writer.write('\ufeff');
+            
+            // ヘッダー行
+            String[] header = {"日付", "学籍番号", "氏名", "ふりがな", "学年", "コマ", "状態", "理由"};
+            csvWriter.writeNext(header);
+            
+            // データ行
+            for (AttendanceWithUserDto dto : attendanceList) {
+                String[] data = {
+                    dto.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                    dto.getUserId(),
+                    dto.getLastName() + " " + dto.getFirstName(),
+                    dto.getLastKanaName() + " " + dto.getFirstKanaName(),
+                    dto.getGradeCode() + "年生",
+                    dto.getLessontimeName() != null ? dto.getLessontimeName() : String.valueOf(dto.getLessontimeCode()),
+                    dto.getStatusName(),
+                    dto.getReason() != null ? dto.getReason() : ""
+                };
+                csvWriter.writeNext(data);
+            }
+        }
+    }
+
+    /**
+     * 月間出席情報画面の共通モデル設定
+     */
+    private void setupMonthlyReportModel(Model model) {
+        // デフォルトは今月
+        model.addAttribute("currentDate", LocalDate.now());
+        
+        // 学年リストを設定（1年生から4年生まで）
+        List<Byte> gradeList = List.of((byte) 1, (byte) 2, (byte) 3, (byte) 4);
+        model.addAttribute("gradeList", gradeList);
+        
+        // 時限一覧を取得
+        List<LessonTime> lessonTimeList = lessonTimeRepository.findAllByOrderByLessontimeCodeAsc();
+        model.addAttribute("lessonTimeList", lessonTimeList);
     }
 
 }
