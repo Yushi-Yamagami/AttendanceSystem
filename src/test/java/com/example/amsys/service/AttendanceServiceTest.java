@@ -148,4 +148,75 @@ class AttendanceServiceTest {
         assertEquals(1, result.size());
         assertEquals("S001", result.get(0).getUserId());
     }
+
+    @Test
+    void testGetMonthlyAttendanceReport_WithFilters() {
+        // モックの設定
+        when(userRepository.findByRoleAndGradeCodeOrderByUserId(UserRole.STUDENT, (byte) 1))
+                .thenReturn(List.of(testStudent1));
+        when(lessonTimeRepository.findById((byte) 1)).thenReturn(Optional.of(testLessonTime));
+        when(attendanceRepository.findById(any(AttendanceId.class)))
+                .thenReturn(Optional.of(testAttendance));
+
+        // テスト実行（2日間分）
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = startDate.plusDays(1);
+        List<AttendanceWithUserDto> result = attendanceService.getMonthlyAttendanceReport(
+                startDate, endDate, (byte) 1, (byte) 1);
+
+        // 検証（1人の学生、1つのコマ、2日分 = 2レコード）
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        // 両日とも同じ学生とコマ
+        assertEquals("S001", result.get(0).getUserId());
+        assertEquals("S001", result.get(1).getUserId());
+        assertEquals((byte) 1, result.get(0).getLessontimeCode());
+        assertEquals((byte) 1, result.get(1).getLessontimeCode());
+    }
+
+    @Test
+    void testGetMonthlyAttendanceReport_NoFilters() {
+        // モックの設定（全学年、全コマ）
+        when(userRepository.findByRoleOrderByUserIdAsc(UserRole.STUDENT))
+                .thenReturn(List.of(testStudent1, testStudent2));
+        when(lessonTimeRepository.findAllByOrderByLessontimeCodeAsc())
+                .thenReturn(List.of(testLessonTime));
+        when(attendanceRepository.findById(any(AttendanceId.class)))
+                .thenReturn(Optional.empty());
+
+        // テスト実行（1日分）
+        LocalDate date = LocalDate.now();
+        List<AttendanceWithUserDto> result = attendanceService.getMonthlyAttendanceReport(
+                date, date, null, null);
+
+        // 検証（2人の学生 × 1つのコマ × 1日 = 2レコード）
+        assertNotNull(result);
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void testGetMonthlyAttendanceReport_MultipleStudentsAndLessons() {
+        // 2つ目のコマを追加
+        LessonTime testLessonTime2 = new LessonTime();
+        testLessonTime2.setLessontimeCode((byte) 2);
+        testLessonTime2.setLessontimeName("2限");
+
+        // モックの設定
+        when(userRepository.findByRoleOrderByUserIdAsc(UserRole.STUDENT))
+                .thenReturn(List.of(testStudent1, testStudent2));
+        when(lessonTimeRepository.findAllByOrderByLessontimeCodeAsc())
+                .thenReturn(List.of(testLessonTime, testLessonTime2));
+        when(attendanceRepository.findById(any(AttendanceId.class)))
+                .thenReturn(Optional.empty());
+
+        // テスト実行（1日分）
+        LocalDate date = LocalDate.now();
+        List<AttendanceWithUserDto> result = attendanceService.getMonthlyAttendanceReport(
+                date, date, null, null);
+
+        // 検証（2人の学生 × 2つのコマ × 1日 = 4レコード）
+        assertNotNull(result);
+        assertEquals(4, result.size());
+    }
 }

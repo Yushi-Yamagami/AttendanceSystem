@@ -517,4 +517,85 @@ class TeacherControllerTest {
         assertEquals("teachers/attendanceList", viewName);
         verify(model).addAttribute("attendanceList", emptyList);
     }
+
+    // 月間出席情報確認機能のテスト
+
+    @Test
+    void testShowMonthlyReport_InitialDisplay() {
+        // Given
+        List<LessonTime> lessonTimes = new ArrayList<>();
+        LessonTime lessonTime = new LessonTime();
+        lessonTime.setLessontimeCode((byte) 1);
+        lessonTime.setLessontimeName("1限");
+        lessonTimes.add(lessonTime);
+
+        when(lessonTimeRepository.findAllByOrderByLessontimeCodeAsc()).thenReturn(lessonTimes);
+
+        // When
+        String viewName = teacherController.showMonthlyReport(model);
+
+        // Then
+        assertEquals("teachers/monthlyReport", viewName);
+        verify(model).addAttribute(eq("currentDate"), any(LocalDate.class));
+        verify(model).addAttribute(eq("gradeList"), anyList());
+        verify(model).addAttribute("lessonTimeList", lessonTimes);
+    }
+
+    @Test
+    void testSearchMonthlyReport_WithAllFilters() {
+        // Given
+        String searchDateStr = "2024-01";
+        Byte gradeCode = 1;
+        Byte lessontimeCode = 1;
+
+        List<LessonTime> lessonTimes = new ArrayList<>();
+        List<AttendanceWithUserDto> attendanceList = new ArrayList<>();
+        AttendanceWithUserDto dto = new AttendanceWithUserDto();
+        dto.setDate(LocalDate.of(2024, 1, 15));
+        dto.setUserId("S001");
+        dto.setLastName("山田");
+        dto.setFirstName("太郎");
+        dto.setGradeCode(gradeCode);
+        dto.setStatusCode(Attendance.AttendanceStatus.PRESENT);
+        dto.setStatusName("出席");
+        attendanceList.add(dto);
+
+        when(lessonTimeRepository.findAllByOrderByLessontimeCodeAsc()).thenReturn(lessonTimes);
+        when(attendanceService.getMonthlyAttendanceReport(any(LocalDate.class), any(LocalDate.class), eq(gradeCode), eq(lessontimeCode)))
+            .thenReturn(attendanceList);
+
+        // When
+        String viewName = teacherController.searchMonthlyReport(searchDateStr, gradeCode, lessontimeCode, model);
+
+        // Then
+        assertEquals("teachers/monthlyReport", viewName);
+        verify(model).addAttribute(eq("searchDate"), any(LocalDate.class));
+        verify(model).addAttribute("selectedGrade", gradeCode);
+        verify(model).addAttribute("selectedLessonTime", lessontimeCode);
+        verify(model).addAttribute("attendanceList", attendanceList);
+        verify(model).addAttribute(eq("startDate"), any(LocalDate.class));
+        verify(model).addAttribute(eq("endDate"), any(LocalDate.class));
+    }
+
+    @Test
+    void testSearchMonthlyReport_NoFilters() {
+        // Given
+        String searchDateStr = "2024-01";
+
+        List<LessonTime> lessonTimes = new ArrayList<>();
+        List<AttendanceWithUserDto> attendanceList = new ArrayList<>();
+
+        when(lessonTimeRepository.findAllByOrderByLessontimeCodeAsc()).thenReturn(lessonTimes);
+        when(attendanceService.getMonthlyAttendanceReport(any(LocalDate.class), any(LocalDate.class), eq(null), eq(null)))
+            .thenReturn(attendanceList);
+
+        // When
+        String viewName = teacherController.searchMonthlyReport(searchDateStr, null, null, model);
+
+        // Then
+        assertEquals("teachers/monthlyReport", viewName);
+        verify(model).addAttribute(eq("searchDate"), any(LocalDate.class));
+        verify(model).addAttribute("attendanceList", attendanceList);
+        verify(attendanceService).getMonthlyAttendanceReport(any(LocalDate.class), any(LocalDate.class), eq(null), eq(null));
+    }
 }
