@@ -91,7 +91,6 @@
                 <th>氏名</th>
                 <th>ふりがな</th>
                 <th>状態</th>
-                <th>理由</th>
               </tr>
             </thead>
             <tbody>
@@ -107,7 +106,6 @@
                         th:text="${attendance.statusName}">
                   </span>
                 </td>
-                <td th:text="${attendance.reason != null ? attendance.reason : '-'}"></td>
               </tr>
             </tbody>
           </table>
