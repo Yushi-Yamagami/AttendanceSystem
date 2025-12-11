@@ -22,7 +22,22 @@ public interface AttendanceRequestRepository extends JpaRepository<AttendanceReq
     List<AttendanceRequest> findByRequestTypeOrderByCreatedAtDesc(RequestType requestType);
 
     /**
-     * 指定されたリクエストタイプの申請一覧を学生情報と共に取得
+     * 指定されたリクエストタイプの申請一覧を学生情報と共に取得（昇順）
+     * @param requestType リクエストタイプ（PENDING, APPROVED）
+     * @return 申請一覧（学生情報付き）
+     */
+    @Query("SELECT new com.example.amsys.dto.AttendanceRequestWithUserDto(" +
+           "ar.requestId, ar.studentId, ar.date, ar.lessontimeCode, ar.status, " +
+           "ar.reason, ar.requestType, ar.teacherId, ar.createdAt, ar.updatedAt, " +
+           "u.lastName, u.firstName, u.lastKanaName, u.firstKanaName) " +
+           "FROM AttendanceRequest ar " +
+           "LEFT JOIN User u ON ar.studentId = u.userId " +
+           "WHERE ar.requestType = :requestType " +
+           "ORDER BY ar.createdAt ASC")
+    List<AttendanceRequestWithUserDto> findByRequestTypeWithUserOrderByCreatedAtAsc(@Param("requestType") RequestType requestType);
+
+    /**
+     * 指定されたリクエストタイプの申請一覧を学生情報と共に取得（降順）
      * @param requestType リクエストタイプ（PENDING, APPROVED）
      * @return 申請一覧（学生情報付き）
      */
