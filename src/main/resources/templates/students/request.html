@@ -117,10 +117,9 @@
         const clearSelection = document.getElementById('clearSelection');
         
         // Function to check/uncheck all checkboxes
-        function setAllCheckboxes(checked, disabled = false) {
+        function setAllCheckboxes(checked) {
             checkboxes.forEach(function(checkbox) {
                 checkbox.checked = checked;
-                checkbox.disabled = disabled;
             });
         }
         
@@ -130,9 +129,7 @@
                 const startTime = checkbox.getAttribute('data-start-time');
                 if (startTime) {
                     const hour = parseInt(startTime.split(':')[0]);
-                    if (hour >= startHour && hour < endHour) {
-                        checkbox.checked = true;
-                    }
+                    checkbox.checked = (hour >= startHour && hour < endHour);
                 }
             });
         }
@@ -140,55 +137,37 @@
         // Function to handle absence status
         function handleAbsenceStatus() {
             if (statusAbsence && statusAbsence.checked) {
-                // Check all and disable
-                setAllCheckboxes(true, true);
-            } else {
-                // Enable all checkboxes
-                checkboxes.forEach(function(checkbox) {
-                    checkbox.disabled = false;
-                });
+                // Check all checkboxes but don't disable them
+                setAllCheckboxes(true);
             }
         }
         
         // Morning button (e.g., before 12:00)
         if (selectMorning) {
             selectMorning.addEventListener('click', function() {
-                if (!isAllDayMode()) {
-                    selectByTime(0, 12);
-                }
+                selectByTime(0, 12);
             });
         }
         
         // Afternoon button (e.g., 12:00 and after)
         if (selectAfternoon) {
             selectAfternoon.addEventListener('click', function() {
-                if (!isAllDayMode()) {
-                    selectByTime(12, 24);
-                }
+                selectByTime(12, 24);
             });
         }
         
         // All day button
         if (selectAllDay) {
             selectAllDay.addEventListener('click', function() {
-                setAllCheckboxes(true, true);
+                setAllCheckboxes(true);
             });
         }
         
         // Clear button
         if (clearSelection) {
             clearSelection.addEventListener('click', function() {
-                if (!isAllDayMode()) {
-                    setAllCheckboxes(false, false);
-                }
+                setAllCheckboxes(false);
             });
-        }
-        
-        // Function to check if we're in "all day" mode
-        function isAllDayMode() {
-            return (statusAbsence && statusAbsence.checked) || 
-                   (checkboxes.length > 0 && 
-                    Array.from(checkboxes).every(cb => cb.checked && cb.disabled));
         }
         
         // Status change handlers
