@@ -71,7 +71,7 @@ public class TeacherController {
     @GetMapping("/approval")
     public String showApprovalList(Model model) {
         List<AttendanceRequestWithUserDto> pendingRequests = 
-            attendanceRequestRepository.findByRequestTypeWithUserOrderByCreatedAtDesc(RequestType.PENDING);
+            attendanceRequestRepository.findByRequestTypeWithUserOrderByCreatedAtAsc(RequestType.PENDING);
         model.addAttribute("pendingRequests", pendingRequests);
         return "teachers/approval";
     }

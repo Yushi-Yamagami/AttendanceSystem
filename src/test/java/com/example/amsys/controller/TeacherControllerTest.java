@@ -99,7 +99,7 @@ class TeacherControllerTest {
         request.setFirstKanaName("タロウ");
         pendingRequests.add(request);
 
-        when(attendanceRequestRepository.findByRequestTypeWithUserOrderByCreatedAtDesc(RequestType.PENDING))
+        when(attendanceRequestRepository.findByRequestTypeWithUserOrderByCreatedAtAsc(RequestType.PENDING))
             .thenReturn(pendingRequests);
 
         // When
@@ -108,13 +108,13 @@ class TeacherControllerTest {
         // Then
         assertEquals("teachers/approval", viewName);
         verify(model).addAttribute("pendingRequests", pendingRequests);
-        verify(attendanceRequestRepository).findByRequestTypeWithUserOrderByCreatedAtDesc(RequestType.PENDING);
+        verify(attendanceRequestRepository).findByRequestTypeWithUserOrderByCreatedAtAsc(RequestType.PENDING);
     }
 
     @Test
     void testShowApprovalList_NoPendingRequests() {
         // Given
-        when(attendanceRequestRepository.findByRequestTypeWithUserOrderByCreatedAtDesc(RequestType.PENDING))
+        when(attendanceRequestRepository.findByRequestTypeWithUserOrderByCreatedAtAsc(RequestType.PENDING))
             .thenReturn(new ArrayList<>());
 
         // When

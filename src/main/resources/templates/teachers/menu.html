@@ -2,46 +2,245 @@
 <html lang="ja"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout_auth}">
+      layout:decorate="~{layouts/layout_teacher}">
 <head>
-  <title>教員メニュー</title>
+  <title>教員ダッシュボード</title>
 </head>
 <body>
 
-<div layout:fragment="content" class="container mt-5">
-  <div class="row">
-    <div class="col-md-8 offset-md-2">
-      <h1 class="mb-4"><i class="bi bi-person-badge me-2"></i>教員メニュー</h1>
-      
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">出席登録</h5>
-          <p class="card-text">学年と時限を指定して、学生の出席情報を登録できます。</p>
-          <a th:href="@{/teachers/confirmation}" class="btn btn-primary">登録する</a>
-        </div>
-      </div>
-      
-      <div class="card mt-3">
-        <div class="card-body">
-          <h5 class="card-title">出欠席申請承認</h5>
-          <p class="card-text">学生からの出欠席申請を確認・承認できます。</p>
-          <a th:href="@{/teachers/approval}" class="btn btn-primary">申請を承認する</a>
+<div layout:fragment="page-title">
+    <i class="bi bi-speedometer2 me-2"></i>ダッシュボード
+</div>
+
+<div layout:fragment="content">
+  <div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+      <h1 class="h3 mb-0 text-gray-800">
+        <i class="bi bi-speedometer2 me-2 text-primary"></i>教員ダッシュボード
+      </h1>
+    </div>
+
+    <!-- Content Row - Statistics Cards -->
+    <div class="row">
+      <!-- Pending Approvals Card -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2" style="border-left: 4px solid #f6c23e;">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                  承認待ち申請
+                </div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                  <i class="bi bi-hourglass-split"></i> 確認してください
+                </div>
+              </div>
+              <div class="col-auto">
+                <i class="bi bi-clipboard-check" style="font-size: 2rem; color: #f6c23e;"></i>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="card mt-3">
-        <div class="card-body">
-          <h5 class="card-title">出席確認</h5>
-          <p class="card-text">学年と授業時間で学生の出席状況を確認できます。</p>
-          <a th:href="@{/teachers/attendanceList}" class="btn btn-primary">出席状況を確認する</a>
+      <!-- Attendance Registration Card -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2" style="border-left: 4px solid #4e73df;">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                  出席登録
+                </div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                  一括登録
+                </div>
+              </div>
+              <div class="col-auto">
+                <i class="bi bi-pencil-square" style="font-size: 2rem; color: #4e73df;"></i>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="card mt-3">
-        <div class="card-body">
-          <h5 class="card-title">月間出席情報確認</h5>
-          <p class="card-text">1か月分の出席情報を日付、学年、授業で検索して確認できます。CSV出力も可能です。</p>
-          <a th:href="@{/teachers/monthlyReport}" class="btn btn-primary">月間情報を確認する</a>
+      <!-- Attendance Check Card -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2" style="border-left: 4px solid #1cc88a;">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                  出席確認
+                </div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                  状況確認
+                </div>
+              </div>
+              <div class="col-auto">
+                <i class="bi bi-list-check" style="font-size: 2rem; color: #1cc88a;"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Monthly Report Card -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2" style="border-left: 4px solid #36b9cc;">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                  月間レポート
+                </div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                  CSV出力
+                </div>
+              </div>
+              <div class="col-auto">
+                <i class="bi bi-calendar3" style="font-size: 2rem; color: #36b9cc;"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Row - Main Functions -->
+    <div class="row">
+      <!-- Left Column -->
+      <div class="col-lg-8 mb-4">
+        <!-- Main Functions -->
+        <div class="card shadow mb-4">
+          <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">
+              <i class="bi bi-grid-3x3-gap-fill me-2"></i>主要機能
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <div class="card border-0" style="background-color: #fff3cd;">
+                  <div class="card-body">
+                    <h5 class="card-title">
+                      <i class="bi bi-clipboard-check text-warning me-2"></i>出欠席申請承認
+                    </h5>
+                    <p class="card-text">学生からの出欠席申請を確認・承認できます。</p>
+                    <a th:href="@{/teachers/approval}" class="btn btn-warning">
+                      <i class="bi bi-arrow-right-circle me-1"></i>申請を確認
+                    </a>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <div class="card border-0" style="background-color: #d1ecf1;">
+                  <div class="card-body">
+                    <h5 class="card-title">
+                      <i class="bi bi-pencil-square text-primary me-2"></i>出席登録
+                    </h5>
+                    <p class="card-text">学年と時限を指定して、学生の出席情報を登録できます。</p>
+                    <a th:href="@{/teachers/confirmation}" class="btn btn-primary">
+                      <i class="bi bi-arrow-right-circle me-1"></i>登録する
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <div class="card border-0" style="background-color: #d4edda;">
+                  <div class="card-body">
+                    <h5 class="card-title">
+                      <i class="bi bi-list-check text-success me-2"></i>出席確認
+                    </h5>
+                    <p class="card-text">学年と授業時間で学生の出席状況を確認できます。</p>
+                    <a th:href="@{/teachers/attendanceList}" class="btn btn-success">
+                      <i class="bi bi-arrow-right-circle me-1"></i>確認する
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <div class="card border-0" style="background-color: #d1ecf1;">
+                  <div class="card-body">
+                    <h5 class="card-title">
+                      <i class="bi bi-calendar3 text-info me-2"></i>月間出席情報確認
+                    </h5>
+                    <p class="card-text">1か月分の出席情報を日付、学年、授業で検索して確認できます。</p>
+                    <a th:href="@{/teachers/monthlyReport}" class="btn btn-info">
+                      <i class="bi bi-arrow-right-circle me-1"></i>確認する
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="col-lg-4 mb-4">
+        <!-- Quick Info Card -->
+        <div class="card shadow mb-4">
+          <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+              <i class="bi bi-info-circle me-2"></i>クイック情報
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="mb-3 pb-3 border-bottom">
+              <div class="small text-muted mb-1">今日の日付</div>
+              <div class="h5 mb-0" th:text="${#temporals.format(#temporals.createNow(), 'yyyy年MM月dd日')}"></div>
+            </div>
+            <div class="mb-3 pb-3 border-bottom">
+              <div class="small text-muted mb-1">曜日</div>
+              <div class="h5 mb-0" th:text="${#temporals.format(#temporals.createNow(), 'EEEE', 'ja')}"></div>
+            </div>
+            <div class="mb-3">
+              <div class="small text-muted mb-1">システム状態</div>
+              <div class="h5 mb-0">
+                <span class="badge bg-success">
+                  <i class="bi bi-check-circle me-1"></i>正常稼働中
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="card shadow">
+          <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+              <i class="bi bi-link-45deg me-2"></i>クイックリンク
+            </h6>
+          </div>
+          <div class="card-body">
+            <ul class="list-unstyled mb-0">
+              <li class="mb-2">
+                <a th:href="@{/teachers/approval}" class="text-decoration-none">
+                  <i class="bi bi-chevron-right text-primary me-2"></i>承認待ち申請
+                </a>
+              </li>
+              <li class="mb-2">
+                <a th:href="@{/teachers/confirmation}" class="text-decoration-none">
+                  <i class="bi bi-chevron-right text-primary me-2"></i>一括出席登録
+                </a>
+              </li>
+              <li class="mb-2">
+                <a th:href="@{/teachers/monthlyReport}" class="text-decoration-none">
+                  <i class="bi bi-chevron-right text-primary me-2"></i>レポート出力
+                </a>
+              </li>
+              <li>
+                <a th:href="@{/}" class="text-decoration-none">
+                  <i class="bi bi-chevron-right text-primary me-2"></i>ホームに戻る
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
