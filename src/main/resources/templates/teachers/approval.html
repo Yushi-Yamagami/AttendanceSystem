@@ -41,8 +41,10 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>申請ID</th>
-                                    <th>学籍番号</th>
                                     <th>日付</th>
+                                    <th>学籍番号</th>
+                                    <th>氏名</th>
+                                    <th>かな</th>
                                     <th>授業時間</th>
                                     <th>状態</th>
                                     <th>申請日時</th>
@@ -52,8 +54,10 @@
                             <tbody>
                                 <tr th:each="request : ${pendingRequests}">
                                     <td th:text="${request.requestId}"></td>
-                                    <td th:text="${request.studentId}"></td>
                                     <td th:text="${#temporals.format(request.date, 'yyyy/MM/dd')}"></td>
+                                    <td th:text="${request.studentId}"></td>
+                                    <td th:text="${request.lastName + ' ' + request.firstName}"></td>
+                                    <td th:text="${request.lastKanaName + ' ' + request.firstKanaName}"></td>
                                     <td th:text="${request.lessontimeCode} + '時限'"></td>
                                     <td>
                                         <span th:if="${request.status.name() == 'ABSENCE'}" class="badge bg-danger">欠席</span>

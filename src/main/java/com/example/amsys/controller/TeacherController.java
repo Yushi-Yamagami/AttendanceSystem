@@ -27,6 +27,7 @@ import com.opencsv.CSVWriter;
 
 import jakarta.servlet.http.HttpServletResponse;
 
+import com.example.amsys.dto.AttendanceRequestWithUserDto;
 import com.example.amsys.dto.AttendanceWithUserDto;
 import com.example.amsys.form.AttendanceInputForm;
 import com.example.amsys.form.BatchAttendanceForm;
@@ -69,8 +70,8 @@ public class TeacherController {
      */
     @GetMapping("/approval")
     public String showApprovalList(Model model) {
-        List<AttendanceRequest> pendingRequests = 
-            attendanceRequestRepository.findByRequestTypeOrderByCreatedAtDesc(RequestType.PENDING);
+        List<AttendanceRequestWithUserDto> pendingRequests = 
+            attendanceRequestRepository.findByRequestTypeWithUserOrderByCreatedAtDesc(RequestType.PENDING);
         model.addAttribute("pendingRequests", pendingRequests);
         return "teachers/approval";
     }
