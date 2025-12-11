@@ -125,6 +125,12 @@
             text-align: center;
         }
         
+        .nav-link.logout-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
         .nav-divider {
             height: 1px;
             background-color: rgba(255, 255, 255, 0.1);
@@ -249,7 +255,7 @@
             <li class="nav-item">
                 <form method="post" th:action="@{/logout}" class="m-0"
                       onsubmit="return confirm('本当にログアウトしますか？')">
-                    <button type="submit" class="nav-link w-100 text-start" style="background: none; border: none;">
+                    <button type="submit" class="nav-link logout-btn w-100 text-start">
                         <i class="bi bi-box-arrow-right"></i>
                         <span>ログアウト</span>
                     </button>
@@ -300,10 +306,15 @@
             
             navLinks.forEach(link => {
                 const href = link.getAttribute('href');
-                if (href && currentPath.includes(href) && href !== '/teachers/menu') {
-                    link.classList.add('active');
-                } else if (href === '/teachers/menu' && currentPath === '/teachers/menu') {
-                    link.classList.add('active');
+                if (href && href !== '#') {
+                    // Exact match for menu page
+                    if (href === '/teachers/menu' && currentPath === '/teachers/menu') {
+                        link.classList.add('active');
+                    }
+                    // For other pages, check if current path starts with href and is not just menu
+                    else if (href !== '/teachers/menu' && currentPath.startsWith(href)) {
+                        link.classList.add('active');
+                    }
                 }
             });
         });
