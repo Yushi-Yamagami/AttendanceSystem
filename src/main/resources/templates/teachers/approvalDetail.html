@@ -62,7 +62,7 @@
                             <div class="detail-value" th:text="${#temporals.format(request.date, 'yyyy年MM月dd日')}"></div>
                         </div>
                         <div class="col-md-6">
-                            <div class="detail-label">時限</div>
+                            <div class="detail-label">授業時間</div>
                             <div class="detail-value">
                                 <span th:text="${request.lessontimeCode} + '時限'"></span>
                                 <span th:if="${lessonTime != null}" th:text="' (' + ${lessonTime.startTime} + '～' + ${lessonTime.finishTime} + ')'"></span>
