@@ -12,6 +12,7 @@
     <style>
         :root {
             --sidebar-width: 260px;
+            --sidebar-collapsed-width: 80px;
             --topbar-height: 60px;
             --primary-color: #4e73df;
             --primary-dark: #2e59d9;
@@ -37,7 +38,27 @@
             display: flex;
             align-items: center;
             padding: 0 1.5rem;
-            transition: left 0.3s;
+            transition: left 0.3s ease;
+        }
+        
+        .topbar.sidebar-collapsed {
+            left: var(--sidebar-collapsed-width);
+        }
+        
+        .sidebar-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            margin-right: 1rem;
+            transition: background 0.15s;
+        }
+        
+        .sidebar-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
         
         .topbar h1 {
@@ -65,8 +86,34 @@
             bottom: 0;
             z-index: 1001;
             overflow-y: auto;
+            overflow-x: hidden;
             box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-            transition: transform 0.3s;
+            transition: width 0.3s ease;
+        }
+        
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+        
+        .sidebar.collapsed .sidebar-brand-text {
+            display: none;
+        }
+        
+        .sidebar.collapsed .nav-link span {
+            display: none;
+        }
+        
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 0.875rem 0.5rem;
+        }
+        
+        .sidebar.collapsed .nav-link i {
+            margin-right: 0;
+        }
+        
+        .sidebar.collapsed .nav-divider {
+            margin: 0.5rem 0;
         }
         
         .sidebar-brand {
@@ -143,7 +190,11 @@
             margin-top: var(--topbar-height);
             padding: 1.5rem;
             min-height: calc(100vh - var(--topbar-height));
-            transition: margin-left 0.3s;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .main-content.sidebar-collapsed {
+            margin-left: var(--sidebar-collapsed-width);
         }
         
         /* Cards */
@@ -175,23 +226,53 @@
                 left: 0;
             }
             
+            .topbar.sidebar-collapsed {
+                left: 0;
+            }
+            
             .main-content {
+                margin-left: 0;
+            }
+            
+            .main-content.sidebar-collapsed {
                 margin-left: 0;
             }
             
             .mobile-menu-toggle {
                 display: block !important;
             }
+            
+            .sidebar-toggle {
+                display: none !important;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .mobile-menu-toggle {
+                display: none !important;
+            }
+            
+            .sidebar-toggle {
+                display: block !important;
+            }
         }
         
         .mobile-menu-toggle {
             display: none;
-            background: none;
+            background: rgba(255, 255, 255, 0.2);
             border: none;
             color: white;
             font-size: 1.5rem;
             cursor: pointer;
             padding: 0.5rem;
+            border-radius: 0.25rem;
+            margin-right: 1rem;
+            transition: background 0.15s;
+        }
+        
+        .mobile-menu-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
         }
     </style>
   </head>
@@ -265,8 +346,11 @@
     </nav>
 
     <!-- Topbar -->
-    <div class="topbar">
-        <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+    <div class="topbar" id="topbar">
+        <button class="sidebar-toggle" onclick="toggleSidebarCollapse()" title="サイドバーを折りたたむ">
+            <i class="bi bi-list"></i>
+        </button>
+        <button class="mobile-menu-toggle" onclick="toggleSidebarMobile()">
             <i class="bi bi-list"></i>
         </button>
         <h1 layout:fragment="page-title">出欠席管理システム</h1>
@@ -277,13 +361,29 @@
     </div>
 
     <!-- Main Content -->
-    <main class="main-content" layout:fragment="content">
+    <main class="main-content" id="mainContent" layout:fragment="content">
       <!-- 各ページのコンテンツがここに挿入されます -->
     </main>
 
     <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
     <script>
-        function toggleSidebar() {
+        // Desktop sidebar collapse/expand
+        function toggleSidebarCollapse() {
+            const sidebar = document.getElementById('sidebar');
+            const topbar = document.getElementById('topbar');
+            const mainContent = document.getElementById('mainContent');
+            
+            sidebar.classList.toggle('collapsed');
+            topbar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('sidebar-collapsed');
+            
+            // Save state to localStorage
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            localStorage.setItem('sidebarCollapsed', isCollapsed);
+        }
+        
+        // Mobile sidebar toggle
+        function toggleSidebarMobile() {
             document.getElementById('sidebar').classList.toggle('show');
         }
         
@@ -299,8 +399,17 @@
             }
         });
         
-        // Set active nav item based on current page
+        // Set active nav item based on current page and restore sidebar state
         document.addEventListener('DOMContentLoaded', function() {
+            // Restore sidebar collapse state
+            const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (sidebarCollapsed) {
+                document.getElementById('sidebar').classList.add('collapsed');
+                document.getElementById('topbar').classList.add('sidebar-collapsed');
+                document.getElementById('mainContent').classList.add('sidebar-collapsed');
+            }
+            
+            // Set active nav item
             const currentPath = window.location.pathname;
             const navLinks = document.querySelectorAll('.sidebar .nav-link');
             
