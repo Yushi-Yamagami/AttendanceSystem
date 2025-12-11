@@ -134,11 +134,14 @@
             });
         }
         
-        // Function to handle absence status
-        function handleAbsenceStatus() {
+        // Function to handle status changes
+        function handleStatusChange() {
             if (statusAbsence && statusAbsence.checked) {
                 // Check all checkboxes but don't disable them
                 setAllCheckboxes(true);
+            } else {
+                // When switching to late or leave early, don't auto-check boxes
+                // User should manually select the appropriate time periods
             }
         }
         
@@ -172,17 +175,17 @@
         
         // Status change handlers
         if (statusAbsence) {
-            statusAbsence.addEventListener('change', handleAbsenceStatus);
+            statusAbsence.addEventListener('change', handleStatusChange);
         }
         if (statusLate) {
-            statusLate.addEventListener('change', handleAbsenceStatus);
+            statusLate.addEventListener('change', handleStatusChange);
         }
         if (statusLeaveEarly) {
-            statusLeaveEarly.addEventListener('change', handleAbsenceStatus);
+            statusLeaveEarly.addEventListener('change', handleStatusChange);
         }
         
         // Initial check on page load
-        handleAbsenceStatus();
+        handleStatusChange();
     });
     </script>
 </main>
