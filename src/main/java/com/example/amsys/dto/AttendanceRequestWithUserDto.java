@@ -18,7 +18,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AttendanceRequestWithUserDto {
-	
 	private Long requestId;
 	private String studentId;
 	private LocalDate date;
@@ -35,5 +34,4 @@ public class AttendanceRequestWithUserDto {
 	private String firstName;
 	private String lastKanaName;
 	private String firstKanaName;
-
 }
