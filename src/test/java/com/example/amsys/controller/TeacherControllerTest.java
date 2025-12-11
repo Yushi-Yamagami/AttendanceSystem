@@ -37,6 +37,7 @@ import static org.mockito.Mockito.*;
 import java.security.Principal;
 import java.util.stream.Collectors;
 
+import com.example.amsys.dto.AttendanceRequestWithUserDto;
 import com.example.amsys.dto.AttendanceWithUserDto;
 
 /**
@@ -82,8 +83,8 @@ class TeacherControllerTest {
     @Test
     void testShowApprovalList_PendingRequestsExist() {
         // Given
-        List<AttendanceRequest> pendingRequests = new ArrayList<>();
-        AttendanceRequest request = new AttendanceRequest();
+        List<AttendanceRequestWithUserDto> pendingRequests = new ArrayList<>();
+        AttendanceRequestWithUserDto request = new AttendanceRequestWithUserDto();
         request.setRequestId(1L);
         request.setStudentId("S001");
         request.setDate(LocalDate.now());
@@ -92,9 +93,13 @@ class TeacherControllerTest {
         request.setReason("体調不良");
         request.setRequestType(RequestType.PENDING);
         request.setCreatedAt(LocalDateTime.now());
+        request.setLastName("山田");
+        request.setFirstName("太郎");
+        request.setLastKanaName("ヤマダ");
+        request.setFirstKanaName("タロウ");
         pendingRequests.add(request);
 
-        when(attendanceRequestRepository.findByRequestTypeOrderByCreatedAtDesc(RequestType.PENDING))
+        when(attendanceRequestRepository.findByRequestTypeWithUserOrderByCreatedAtDesc(RequestType.PENDING))
             .thenReturn(pendingRequests);
 
         // When
@@ -103,13 +108,13 @@ class TeacherControllerTest {
         // Then
         assertEquals("teachers/approval", viewName);
         verify(model).addAttribute("pendingRequests", pendingRequests);
-        verify(attendanceRequestRepository).findByRequestTypeOrderByCreatedAtDesc(RequestType.PENDING);
+        verify(attendanceRequestRepository).findByRequestTypeWithUserOrderByCreatedAtDesc(RequestType.PENDING);
     }
 
     @Test
     void testShowApprovalList_NoPendingRequests() {
         // Given
-        when(attendanceRequestRepository.findByRequestTypeOrderByCreatedAtDesc(RequestType.PENDING))
+        when(attendanceRequestRepository.findByRequestTypeWithUserOrderByCreatedAtDesc(RequestType.PENDING))
             .thenReturn(new ArrayList<>());
 
         // When
