@@ -89,9 +89,8 @@
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="card-title mb-0">
               出席情報一覧 
-              <span th:if="${startDate != null and endDate != null}">
-                (<span th:text="${#temporals.format(startDate, 'yyyy年MM月dd日')}"></span> 〜 
-                <span th:text="${#temporals.format(endDate, 'yyyy年MM月dd日')}"></span>)
+              <span th:if="${displayDate != null}">
+                (<span th:text="${#temporals.format(displayDate, 'yyyy年MM月dd日')}"></span>)
               </span>
             </h5>
             

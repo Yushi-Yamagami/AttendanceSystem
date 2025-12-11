@@ -573,8 +573,7 @@ class TeacherControllerTest {
         verify(model).addAttribute("selectedGrade", gradeCode);
         verify(model).addAttribute("selectedLessonTime", lessontimeCode);
         verify(model).addAttribute("attendanceList", attendanceList);
-        verify(model).addAttribute(eq("startDate"), any(LocalDate.class));
-        verify(model).addAttribute(eq("endDate"), any(LocalDate.class));
+        verify(model).addAttribute(eq("displayDate"), any(LocalDate.class));
     }
 
     @Test
