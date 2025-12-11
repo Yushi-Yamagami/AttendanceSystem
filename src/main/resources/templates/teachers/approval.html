@@ -2,33 +2,43 @@
 <html lang="ja"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout_auth}">
+      layout:decorate="~{layouts/layout_teacher}">
 <head>
     <title>出欠席申請承認</title>
 </head>
 <body>
 
-<div layout:fragment="content" class="container mt-5">
-    <div class="row">
-        <div class="col-md-10 offset-md-1">
-            <h1 class="mb-4"><i class="bi bi-check-circle me-2"></i>出欠席申請承認</h1>
+<div layout:fragment="page-title">
+    <i class="bi bi-clipboard-check me-2"></i>申請承認
+</div>
+
+<div layout:fragment="content" class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="bi bi-clipboard-check me-2 text-primary"></i>出欠席申請承認
+        </h1>
+    </div>
             
             <!-- Success Message -->
             <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-2"></i>
                 <span th:text="${successMessage}"></span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             
             <!-- Error Message -->
             <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
                 <span th:text="${errorMessage}"></span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             
             <!-- Pending Requests Table -->
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="bi bi-hourglass-split me-2"></i>承認待ち申請一覧</h5>
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h6 class="m-0 font-weight-bold text-white">
+                        <i class="bi bi-hourglass-split me-2"></i>承認待ち申請一覧
+                    </h6>
                 </div>
                 <div class="card-body">
                     <div th:if="${pendingRequests == null or pendingRequests.isEmpty()}" class="text-center py-4">
@@ -90,14 +100,7 @@
                 </div>
             </div>
             
-            <!-- Back Button -->
-            <div class="mt-4">
-                <a th:href="@{/teachers/menu}" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> メニューに戻る
-                </a>
-            </div>
-        </div>
-    </div>
+            <!-- Back Button removed - using sidebar navigation -->
 </div>
 
 </body>

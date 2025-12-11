@@ -1,30 +1,312 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">出欠席管理システム</title>
+    <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">出欠席管理システム - 教員</title>
     <link th:href="@{/css/bootstrap/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/css/bootstrap/bootstrap-icons.min.css}" rel="stylesheet">
     <link th:href="@{/css/amsys/layout/style.css}" rel="stylesheet">
     <style>
+        :root {
+            --sidebar-width: 260px;
+            --topbar-height: 60px;
+            --primary-color: #4e73df;
+            --primary-dark: #2e59d9;
+            --sidebar-bg: #343a40;
+            --sidebar-hover: #495057;
+        }
+        
         body {
-            padding-top: 70px;
-            padding-bottom: 70px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fc;
+        }
+        
+        /* Topbar */
+        .topbar {
+            height: var(--topbar-height);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: var(--sidebar-width);
+            z-index: 1000;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            transition: left 0.3s;
+        }
+        
+        .topbar h1 {
+            color: white;
+            font-size: 1.5rem;
+            margin: 0;
+            font-weight: 500;
+        }
+        
+        .topbar .user-info {
+            margin-left: auto;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 1001;
+            overflow-y: auto;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            transition: transform 0.3s;
+        }
+        
+        .sidebar-brand {
+            height: var(--topbar-height);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-brand-text {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        .sidebar-brand-icon {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+        }
+        
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+        
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+        
+        .nav-link:hover {
+            background-color: var(--sidebar-hover);
+            color: white;
+        }
+        
+        .nav-link.active {
+            background-color: rgba(78, 115, 223, 0.3);
+            color: white;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .nav-link i {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            width: 1.5rem;
+            text-align: center;
+        }
+        
+        .nav-divider {
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.1);
+            margin: 1rem 0;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--topbar-height);
+            padding: 1.5rem;
+            min-height: calc(100vh - var(--topbar-height));
+            transition: margin-left 0.3s;
+        }
+        
+        /* Cards */
+        .dashboard-card {
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .topbar {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-menu-toggle {
+                display: block !important;
+            }
+        }
+        
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
         }
     </style>
   </head>
   <body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <a th:href="@{/teachers/menu}" class="sidebar-brand-text">
+                <i class="bi bi-mortarboard-fill sidebar-brand-icon"></i>
+                教員ダッシュボード
+            </a>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li class="nav-item">
+                <a th:href="@{/teachers/menu}" class="nav-link">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>ダッシュボード</span>
+                </a>
+            </li>
+            
+            <div class="nav-divider"></div>
+            
+            <li class="nav-item">
+                <a th:href="@{/teachers/approval}" class="nav-link">
+                    <i class="bi bi-clipboard-check"></i>
+                    <span>申請承認</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a th:href="@{/teachers/confirmation}" class="nav-link">
+                    <i class="bi bi-pencil-square"></i>
+                    <span>出席登録</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a th:href="@{/teachers/attendanceList}" class="nav-link">
+                    <i class="bi bi-list-check"></i>
+                    <span>出席確認</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a th:href="@{/teachers/monthlyReport}" class="nav-link">
+                    <i class="bi bi-calendar3"></i>
+                    <span>月間レポート</span>
+                </a>
+            </li>
+            
+            <div class="nav-divider"></div>
+            
+            <li class="nav-item">
+                <a th:href="@{/}" class="nav-link">
+                    <i class="bi bi-house"></i>
+                    <span>ホーム</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <form method="post" th:action="@{/logout}" class="m-0"
+                      onsubmit="return confirm('本当にログアウトしますか？')">
+                    <button type="submit" class="nav-link w-100 text-start" style="background: none; border: none;">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>ログアウト</span>
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </nav>
 
-    <div th:replace="~{layouts/header_D :: header_D}"></div>
+    <!-- Topbar -->
+    <div class="topbar">
+        <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+            <i class="bi bi-list"></i>
+        </button>
+        <h1 layout:fragment="page-title">出欠席管理システム</h1>
+        <div class="user-info">
+            <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
+            <span sec:authentication="name">教員</span>
+        </div>
+    </div>
 
-    <main layout:fragment="content">
+    <!-- Main Content -->
+    <main class="main-content" layout:fragment="content">
       <!-- 各ページのコンテンツがここに挿入されます -->
     </main>
 
-    <div th:replace="~{layouts/footer_teacher :: footer_teacher}"></div>
-
     <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('show');
+        }
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(event.target) && !toggle.contains(event.target)) {
+                    sidebar.classList.remove('show');
+                }
+            }
+        });
+        
+        // Set active nav item based on current page
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.sidebar .nav-link');
+            
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && currentPath.includes(href) && href !== '/teachers/menu') {
+                    link.classList.add('active');
+                } else if (href === '/teachers/menu' && currentPath === '/teachers/menu') {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
   </body>
 </html>
