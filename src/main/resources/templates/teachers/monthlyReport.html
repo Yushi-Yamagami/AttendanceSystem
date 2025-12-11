@@ -45,9 +45,9 @@
           
           <form th:action="@{/teachers/monthlyReport}" method="post" class="row g-3 mt-2">
             <div class="col-md-3">
-              <label for="searchDate" class="form-label">確認月</label>
-              <input type="month" id="searchDate" name="searchDate" class="form-control" 
-                     th:value="${searchDate != null ? #temporals.format(searchDate, 'yyyy-MM') : #temporals.format(currentDate, 'yyyy-MM')}" 
+              <label for="searchDate" class="form-label">確認日</label>
+              <input type="date" id="searchDate" name="searchDate" class="form-control" 
+                     th:value="${searchDate != null ? #temporals.format(searchDate, 'yyyy-MM-dd') : #temporals.format(currentDate, 'yyyy-MM-dd')}" 
                      required>
             </div>
             
@@ -99,7 +99,7 @@
                   th:action="@{/teachers/monthlyReport/export}" 
                   method="get" 
                   class="d-inline">
-              <input type="hidden" name="searchDate" th:value="${searchDate != null ? #temporals.format(searchDate, 'yyyy-MM') : #temporals.format(currentDate, 'yyyy-MM')}">
+              <input type="hidden" name="searchDate" th:value="${searchDate != null ? #temporals.format(searchDate, 'yyyy-MM-dd') : #temporals.format(currentDate, 'yyyy-MM-dd')}">
               <input type="hidden" name="gradeCode" th:value="${selectedGrade}">
               <input type="hidden" name="lessontimeCode" th:value="${selectedLessonTime}">
               <button type="submit" class="btn btn-success">

@@ -428,9 +428,8 @@ public class TeacherController {
         
         setupMonthlyReportModel(model);
         
-        // yyyy-MM形式の文字列をLocalDateに変換（月の最初の日）
-        YearMonth yearMonth = YearMonth.parse(searchDateStr);
-        LocalDate searchDate = yearMonth.atDay(1);
+        // yyyy-MM-dd形式の文字列をLocalDateに変換
+        LocalDate searchDate = LocalDate.parse(searchDateStr);
         
         // 選択された値を保持
         model.addAttribute("searchDate", searchDate);
@@ -442,13 +441,15 @@ public class TeacherController {
         }
         
         // 検索日から1か月分の日付範囲を計算
+        YearMonth yearMonth = YearMonth.from(searchDate);
+        LocalDate startDate = searchDate.withDayOfMonth(1);
         LocalDate endDate = yearMonth.atEndOfMonth();
         
         // 出席情報を取得
         List<AttendanceWithUserDto> attendanceList = attendanceService.getMonthlyAttendanceReport(
-            searchDate, endDate, gradeCode, lessontimeCode);
+            startDate, endDate, gradeCode, lessontimeCode);
         model.addAttribute("attendanceList", attendanceList);
-        model.addAttribute("startDate", searchDate);
+        model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
         
         return "teachers/monthlyReport";
@@ -464,19 +465,20 @@ public class TeacherController {
             @RequestParam(value = "lessontimeCode", required = false) Byte lessontimeCode,
             HttpServletResponse response) throws IOException {
         
-        // yyyy-MM形式の文字列をLocalDateに変換
-        YearMonth yearMonth = YearMonth.parse(searchDateStr);
-        LocalDate searchDate = yearMonth.atDay(1);
+        // yyyy-MM-dd形式の文字列をLocalDateに変換
+        LocalDate searchDate = LocalDate.parse(searchDateStr);
         
         // 検索日から1か月分の日付範囲を計算
+        YearMonth yearMonth = YearMonth.from(searchDate);
+        LocalDate startDate = searchDate.withDayOfMonth(1);
         LocalDate endDate = yearMonth.atEndOfMonth();
         
         // 出席情報を取得
         List<AttendanceWithUserDto> attendanceList = attendanceService.getMonthlyAttendanceReport(
-            searchDate, endDate, gradeCode, lessontimeCode);
+            startDate, endDate, gradeCode, lessontimeCode);
         
         // CSV出力の設定
-        String fileName = "attendance_report_" + searchDate.format(DateTimeFormatter.ofPattern("yyyyMM")) + ".csv";
+        String fileName = "attendance_report_" + searchDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + ".csv";
         response.setContentType("text/csv; charset=UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
         

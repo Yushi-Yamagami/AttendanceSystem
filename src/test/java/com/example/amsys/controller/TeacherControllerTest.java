@@ -544,7 +544,7 @@ class TeacherControllerTest {
     @Test
     void testSearchMonthlyReport_WithAllFilters() {
         // Given
-        String searchDateStr = "2024-01";
+        String searchDateStr = "2024-01-15";
         Byte gradeCode = 1;
         Byte lessontimeCode = 1;
 
@@ -580,7 +580,7 @@ class TeacherControllerTest {
     @Test
     void testSearchMonthlyReport_NoFilters() {
         // Given
-        String searchDateStr = "2024-01";
+        String searchDateStr = "2024-01-15";
 
         List<LessonTime> lessonTimes = new ArrayList<>();
         List<AttendanceWithUserDto> attendanceList = new ArrayList<>();
