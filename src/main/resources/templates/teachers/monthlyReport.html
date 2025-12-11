@@ -52,9 +52,9 @@
             </div>
             
             <div class="col-md-3">
-              <label for="gradeCode" class="form-label">学年（任意）</label>
+              <label for="gradeCode" class="form-label">学年</label>
               <select id="gradeCode" name="gradeCode" class="form-select">
-                <option value="">全学年</option>
+                <option value="">選択してください。</option>
                 <option th:each="grade : ${gradeList}" 
                         th:value="${grade}" 
                         th:text="${grade + '年生'}"
@@ -64,9 +64,9 @@
             </div>
             
             <div class="col-md-3">
-              <label for="lessontimeCode" class="form-label">コマ（任意）</label>
+              <label for="lessontimeCode" class="form-label">コマ</label>
               <select id="lessontimeCode" name="lessontimeCode" class="form-select">
-                <option value="">全コマ</option>
+                <option value="">選択してください。</option>
                 <option th:each="lessonTime : ${lessonTimeList}" 
                         th:value="${lessonTime.lessontimeCode}" 
                         th:text="${lessonTime.lessontimeName + ' (' + lessonTime.startTime + '～' + lessonTime.finishTime + ')'}"
@@ -122,7 +122,6 @@
                   <th>学年</th>
                   <th>コマ</th>
                   <th>状態</th>
-                  <th>理由</th>
                 </tr>
               </thead>
               <tbody>
@@ -141,7 +140,6 @@
                           th:text="${attendance.statusName}">
                     </span>
                   </td>
-                  <td th:text="${attendance.reason != null ? attendance.reason : ''}"></td>
                 </tr>
               </tbody>
             </table>
